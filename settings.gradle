@@ -1,0 +1,6 @@
+rootProject.name = 'JDS'
+
+include ':common',
+        ':authserver',
+        ':dataserver',
+        ':app:monolith'

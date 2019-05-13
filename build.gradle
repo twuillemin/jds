@@ -1,0 +1,100 @@
+buildscript {
+    ext {
+        kotlinVersion = '1.3.31'
+        springBootVersion = '2.1.4.RELEASE'
+        springfoxVersion = '2.9.2'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}")
+    }
+}
+
+apply {
+    plugin 'idea'
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+    }
+}
+
+allprojects {
+
+    group = 'net.wuillemin.jds'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
+// For Kotlin version against Spring Boot advice to stay in 1.2.71
+ext['kotlin.version'] = '${kotlinVersion}'
+
+subprojects {
+
+    apply plugin: 'kotlin'
+    apply plugin: 'kotlin-spring'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'idea'
+
+    dependencyManagement {
+        imports { mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}") }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    compileKotlin {
+        kotlinOptions {
+            freeCompilerArgs = ["-Xjsr305=strict"]
+            jvmTarget = "1.8"
+        }
+    }
+    compileTestKotlin {
+        kotlinOptions {
+            freeCompilerArgs = ["-Xjsr305=strict"]
+            jvmTarget = "1.8"
+        }
+    }
+
+    idea {
+        module {
+            downloadJavadoc = true
+        }
+    }
+
+    dependencies {
+        // Kotlin
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+        // Spring Boot
+        compile("org.springframework.boot:spring-boot-configuration-processor")
+
+        // Spring Boot Tests
+        testCompile("org.springframework.boot:spring-boot-starter-test") {
+            // Exclude the default JUnit 4
+            exclude module: 'junit'
+        }
+
+        // Add JUnit 5
+        testImplementation('org.junit.jupiter:junit-jupiter-api')
+        testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine')
+
+        // Add mockito Kotlin clean integration
+        testCompile('com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0')
+
+        //testCompile('org.jetbrains.kotlin:kotlin-test')
+        //testCompile('org.jetbrains.kotlin:kotlin-test-junit')
+    }
+}

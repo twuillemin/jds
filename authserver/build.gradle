@@ -1,0 +1,13 @@
+dependencies {
+
+    // The base classes
+    compile project(':common')
+
+    // Add spring boot security
+    compile("org.springframework.boot:spring-boot-starter-security")
+
+    // For Receiving Google Auth
+    compile("org.springframework.security:spring-security-oauth2-client")
+    compile("org.springframework.security:spring-security-oauth2-jose")
+
+}

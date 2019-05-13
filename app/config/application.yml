@@ -1,0 +1,165 @@
+# #####################################################
+# SPRING PROPERTIES
+# #####################################################
+spring:
+
+  # #####################################################
+  # CORE CONFIGURATION
+  # #####################################################
+  application:
+    # Define the name of the application
+    name: JDS Monolith Server - localhost (develop)
+
+  # #####################################################
+  # SPRING SECURITY CONFIGURATION
+  # #####################################################
+  security:
+    # Define the name of the application
+    oauth2:
+      client:
+        registration:
+          google:
+            # This is an example, please do not reuse (or just for a quick test)
+            client-id: 315683091631-apf3la0615kfi1k5iumdop5i166153v5.apps.googleusercontent.com
+            client-secret: o61nbk-kdRxkeJas8vlh3-t6
+
+# #####################################################
+# LOGGING
+# #####################################################
+logging:
+  level:
+    org:
+      springframework: INFO
+    net:
+      wuillemin:
+        jds:
+            auth: DEBUG
+
+# #####################################################
+# GENERAL SERVER PROPERTIES
+# #####################################################
+server:
+  # Network address to which the server should bind.
+  address: 127.0.0.1
+  # The port for running the server
+  port: 8443
+  # The SSL configuration. A new certificate can be generated simply by using the command:
+  # keytool -genkey -alias jds -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore app\config\keystore.p12 -validity 3650
+  ssl:
+    keyStore: config/keystore.p12
+    keyStorePassword: jdsiscool
+    keyStoreType: PKCS12
+    keyAlias: jds
+
+  # Whether response compression is enabled
+  compression:
+    enabled: true
+  # Whether to enable HTTP/2 support, if the current environment supports it
+  http2:
+    enabled: true
+  servlet:
+    # The mounting point
+    context-path: /develop
+
+# #####################################################
+# DATASERVER PROPERTIES
+# #####################################################
+jds:
+
+  # #####################################################
+  # COMMON
+  # #####################################################
+  common:
+
+    # ----------------------------------------------------------------
+    # Define the configuration of the network when acting as a server
+    # ----------------------------------------------------------------
+    server:
+
+      # The `publicKeyPath` holds the path to the public key that was used to sign the JWT tokens. This should be the
+      # symmetric of the `privateKeyPath`
+      # If no publicKeyPath is given, then a false ADMIN user is created and injected in each query received. So that
+      # the Server is fully usable without even logging in. Although nice for debugging purpose, this is a VERY
+      # bad idea in production. Otherwise use something like `publicKeyPath: config/test1_pub.der`
+      publicKeyPath:
+
+    # ----------------------------------------------------------------
+    # Define the configuration of the network when acting as a client of internal web services
+    # ----------------------------------------------------------------
+    client:
+      # Possible options are:
+      # jwt: a list of [authenticationServerURI (string), userName (string), password (string), servers (CSV)]
+      # basic: a list of [userName (string), password (string), servers (CSV)]
+      # noAuth: a single attribute [servers (CSV)]
+      jwt:
+        - # The authentication from which to require a token
+          authenticationServerURI: http://localhost:8080/develop/authentication
+          # The user name of the token
+          userName: service
+          # The password of the token
+          password: service_password
+          # The list of servers for which to use the token
+          servers: http://localhost:8080
+
+    # ----------------------------------------------------------------
+    # The database storing the information about clients and groups which are the
+    # two objects provided by the common library
+    # ----------------------------------------------------------------
+    database:
+      host: localhost
+      port: 27017
+      database: common
+
+  # #####################################################
+  # AUTHENTICATION SERVER
+  # #####################################################
+  authserver:
+
+    # ----------------------------------------------------------------
+    # Properties of the generated tokens
+    # ----------------------------------------------------------------
+
+    # The path of to the file holding the private key
+    privateKeyPath: config/test1_priv.der
+    # The time to live of an authentication token
+    tokenTimeToLiveInSeconds: 1200
+    # The time to live of a refresh token
+    refreshTimeToLiveInSeconds: 12000
+
+    # ----------------------------------------------------------------
+    # Locally defined users (useful for bootstrapping the application)
+    # ----------------------------------------------------------------
+
+    localUsers:
+      - userName: admin
+        password: admin_password
+        profile: ADMIN
+      - userName: user
+        password: user_password
+        profile: USER
+      - userName: service
+        password: service_password
+        profile: SERVICE
+
+  # #####################################################
+  # DATASERVER
+  # #####################################################
+  dataserver:
+    # ----------------------------------------------------------------
+    # The database storing the information about the data models
+    # The database is supposed to be a Mongo Database
+    # ----------------------------------------------------------------
+    configurationDatabase:
+      host: localhost
+      port: 27017
+      database: dataserver
+
+    # ----------------------------------------------------------------
+    # The list of databases for storing user data. At least one must
+    # be present
+    # The database is supposed to be a PostgresDatabase
+    # ----------------------------------------------------------------
+    storageDatabases:
+      - jdbcConnectionUrl: jdbc:postgresql://localhost/jds
+        user: jds
+        password: "jds_password"
