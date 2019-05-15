@@ -98,21 +98,157 @@ The complete documentation is to be written...
 An example of configuration, hopefully enough commented is given in `app/config/application.yml`
 
 ### Registering an User
-_TBW_
 
-### Registering an Organization
-_TBW_
+endpoint: `[POST] /public/v1/registration`
+
+example input: 
+```json
+{
+  "firstName": "thomas",
+  "lastName": "wuillemin", 
+  "userName": "thomas.wuillemin@gmail.com",
+  "password": "p4ssw0rd",
+  "profile": "USER",
+  "enabled": true,
+  "participatingGroupIds": []
+}
+```
+
+Notes:
+
+ * For `userName` it is recommended to an email. If a Gmail is given, user will the be able to authenticate
+ with its current Google user. Also the user name must be unique in the system.
+ * The `password` is obviously not kept in clear (BCrypt hashed)
+ * The values given in `profile` and `enabled` are ignored.
+ * The `participatingGroupIds` must be given empty.
+ 
+### Authenticating an User
+There are two ways of authenticating a user:
+
+ * By user password, endpoint: `[POST] /authentication/v1/internal/login`. In this case the input must be:
+ ```json
+{
+  "userName": "thomas.wuillemin@gmail.com",
+  "password": "p4ssw0rd"
+}
+ ```
+ 
+ * By using the connected Google user, enpoint: `[GET] /authentication/v1/external/login`. In this case, no input is necessary.
+ 
+For both authentication, the endpoint will return JWT token information: 
+```json
+{
+  "authenticationToken": "eyJhbGciOiJSU[...]",
+  "authenticationTokenExpiration": 1557952794,
+  "refreshToken": "247effcb-9bb3-4b29-bdf2-606107dbb5fd",
+  "refreshTokenExpiration": 1557963594
+}
+```
+
+Notes:
+
+ * Times in the token are given from epoch in ms.
+ * It is the responsibility of the client to refresh the token using the endpoint `[POST] /authentication/v1/refresh` 
+ with a query like: 
+```json
+{
+  "refreshToken": "247effcb-9bb3-4b29-bdf2-606107dbb5fd"
+}
+```
+
+### Registering a new Group
+
+endpoint: `[POST] /api/common/v1/groups`
+
+example input: 
+```json
+{
+  "name": "Beautiful Group",
+  "administratorIds": [],
+  "userIds": []
+}
+```
+
+Notes:
+ * The name of the group must be unique system wide.
+ * It is possible to id of existing users to `administratorIds` and `userIds`, but in any case the user creating the 
+ group will defined as an administrator.
+ 
+During the group creation, a schema is automatically created in the default database. It is possible to retrieve the 
+list of schema accessible to an user with the endpoint `[GET] /api/dataserver/v1/configuration/schemas`
 
 ### Importing Data
-_TBW_
 
-### Creating a data structure
-_TBW_
+endpoint: `[POST] /api/dataserver/v1/configuration/dataProviders/autoImportFromCSV`
 
-## Usage
-_TBW_
+```json
+{
+  "schemaId": "id of the schema",
+  "tableName": "Cat",
+  "dataBase64": "TmlycnRpLGZlbWFsZQpDcm9udXMsbWFsZQ=="
+}
+```
+
+Notes:
+ * Data are to be sent in base64 format.
+ * The import will automatically detect the best format for each column.
+ * The result of the import a fully defined DataProvider. This DataProvider can then be modified for defining the 
+ primary keys, etc.
+ 
+### Creating a DataProvider
+
+There are other ways of creating DataProvider: either from a SQL query on existing data, or by inputting directly a 
+DataProvider object.  
+
+### Creating a data source
+
+endpoint: `[POST] /api/dataserver/v1/configuration/dataSources`
+
+```json
+{
+  "dataProviderId": "id of the data provider",
+  "name": "Cat",
+  "userAllowedToReadIds": [],
+  "userAllowedToWriteIds": [],
+  "userAllowedToDeleteIds": []
+}
+```
+
+Notes:
+ * It is not needed to add the administrators of the group as they are... administrators. 
+
+## Client usage
+
+As said before, the client is only dealing with DataSources. Nothing of the previously created object are needed, or 
+even visible
+
+### Discovering
+For discovering, a client can use the following endpoints:
+
+ * `[GET] /api/dataserver/v1/client/readableDataSources` for retrieving the list of all readable DataSources
+ * `[GET] /api/dataserver/v1/client/{dataSourceId}/columns` for getting the columns of a DataSource
 
 ### Reading
+
+endpoint: `[GET] /api/dataserver/v1/client/{dataSourceId}/data`
+
+```json
+{
+  "filter": {},
+  "orders": [
+    {
+      "columnName": "name of the column",
+      "direction": "ASCENDING"
+    }
+  ],
+  "indexFirstRecord": 100,
+  "numberOfRecords": 50
+}
+```
+
+### Filters
+Filters allow the client to provider a predicate that is applied to the query for retrieving the data.
+
 _TBW_
 
 ### Writing
@@ -120,6 +256,11 @@ _TBW_
 
 ### Deleting
 _TBW_
+
+# How-to
+
+If you think something like: "Wow, that seems cool, I am not sure if I can use it. It seems complicated", don't hesitate
+to send me a mail and we will think how we can do it. 
 
 # License
 
