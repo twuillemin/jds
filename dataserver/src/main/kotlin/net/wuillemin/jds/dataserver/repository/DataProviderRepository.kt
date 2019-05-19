@@ -2,12 +2,12 @@ package net.wuillemin.jds.dataserver.repository
 
 import net.wuillemin.jds.dataserver.entity.model.DataProvider
 import net.wuillemin.jds.dataserver.entity.model.Schema
-import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.repository.CrudRepository
 
 /**
  * The repository for [DataProvider] objects
  */
-interface DataProviderRepository : MongoRepository<DataProvider, Long> {
+interface DataProviderRepository : CrudRepository<DataProvider, Long> {
 
     /**
      * Return the list of dataProviders referencing the given [Schema] id

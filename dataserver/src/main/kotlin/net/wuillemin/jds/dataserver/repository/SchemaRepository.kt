@@ -2,12 +2,12 @@ package net.wuillemin.jds.dataserver.repository
 
 import net.wuillemin.jds.dataserver.entity.model.Schema
 import net.wuillemin.jds.dataserver.entity.model.Server
-import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.repository.CrudRepository
 
 /**
  * The repository for [Schema] objects
  */
-interface SchemaRepository : MongoRepository<Schema, Long> {
+interface SchemaRepository : CrudRepository<Schema, Long> {
 
     /**
      * Return the list of schemas referencing the given [Server] id.

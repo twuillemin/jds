@@ -19,7 +19,7 @@ import java.util.*
 
 
 /**
- * The repository of the users that are stored in the database
+ * The repository of the [User]s that are stored in the database
  */
 @Suppress("SqlResolve")
 @Repository
