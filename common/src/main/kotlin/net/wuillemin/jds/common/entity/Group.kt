@@ -10,10 +10,12 @@ package net.wuillemin.jds.common.entity
  * @param userIds The ids of the user that are simple user of the group
  */
 data class Group(
-    val id: String?,
+    val id: Long?,
+
     val name: String,
-    val administratorIds: Set<String>,
-    val userIds: Set<String>) : Loggable {
+    val administratorIds: Set<Long>,
+    val userIds: Set<Long>
+) : Loggable {
 
     override fun getLoggingId(): String {
         return "'${this.name} [id: ${this.id}]'"

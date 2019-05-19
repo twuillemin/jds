@@ -42,7 +42,7 @@ class JWTAuthenticationFilterTest {
     private val publicKey = pemFileReader.readDERPublicKey(publicKeyFile)
 
     private val dummyPermission = UserPermission(
-        "userId",
+        -1L,
         emptyList(),
         emptyList())
 

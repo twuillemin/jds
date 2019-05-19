@@ -10,17 +10,17 @@ package net.wuillemin.jds.common.entity
  * @param lastName The second name of the user
  * @param enabled If the use is enabled or disabled
  * @param profile The profiles of the user
- * @param participatingGroupIds The group that the user declares membership to
  */
 data class User(
-    val id: String?,
+    val id: Long?,
+
     val userName: String,
     val password: String,
     val firstName: String,
     val lastName: String,
     val enabled: Boolean,
-    val profile: Profile,
-    val participatingGroupIds: Set<String>) : Loggable {
+    val profile: Profile
+) : Loggable {
 
     override fun getLoggingId(): String {
         return "'${this.userName} [id: ${this.id}]'"

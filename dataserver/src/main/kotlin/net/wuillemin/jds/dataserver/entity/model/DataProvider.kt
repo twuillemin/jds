@@ -20,8 +20,8 @@ import net.wuillemin.jds.common.entity.Loggable
     JsonSubTypes.Type(value = DataProviderSQL::class, name = "SQL"),
     JsonSubTypes.Type(value = DataProviderGSheet::class, name = "GSheet"))
 sealed class DataProvider(
-    open val id: String?,
-    open val schemaId: String,
+    open val id: Long?,
+    open val schemaId: Long,
     open val name: String,
     open val columns: List<Column>,
     open val editable: Boolean
@@ -39,8 +39,8 @@ sealed class DataProvider(
  */
 data class DataProviderSQL(
     // Inherited properties
-    override val id: String?,
-    override val schemaId: String,
+    override val id: Long?,
+    override val schemaId: Long,
     override val name: String,
     override val columns: List<Column>,
     override val editable: Boolean,
@@ -60,8 +60,8 @@ data class DataProviderSQL(
  */
 data class DataProviderGSheet(
     // Inherited properties
-    override val id: String?,
-    override val schemaId: String,
+    override val id: Long?,
+    override val schemaId: Long,
     override val name: String,
     override val columns: List<Column>,
     override val editable: Boolean,

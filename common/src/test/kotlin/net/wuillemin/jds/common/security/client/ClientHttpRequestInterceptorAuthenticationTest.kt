@@ -16,7 +16,6 @@ import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.mongo.MongoProperties
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -42,7 +41,12 @@ class ClientHttpRequestInterceptorAuthenticationTest {
 
         val interceptor = ClientHttpRequestInterceptorAuthentication(
             CommonProperties(
-                MongoProperties(),
+                CommonProperties.SQLDatabaseProperties(
+                    "jdbcConnectionUrl",
+                    "user",
+                    "password",
+                    "driverClassName"
+                ),
                 Server(null),
                 Client(
                     listOf(JWTAuthentication(URI.create("auth"), "user", "password", listOf(ServerReference("localhost", 8080)))),
@@ -141,7 +145,12 @@ class ClientHttpRequestInterceptorAuthenticationTest {
 
         val interceptor = ClientHttpRequestInterceptorAuthentication(
             CommonProperties(
-                MongoProperties(),
+                CommonProperties.SQLDatabaseProperties(
+                    "jdbcConnectionUrl",
+                    "user",
+                    "password",
+                    "driverClassName"
+                ),
                 Server(null),
                 Client(
                     listOf(JWTAuthentication(URI.create("auth"), "user", "password", listOf(ServerReference("localhost", 8080)))),

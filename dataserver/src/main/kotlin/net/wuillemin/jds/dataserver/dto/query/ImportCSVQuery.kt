@@ -8,7 +8,7 @@ package net.wuillemin.jds.dataserver.dto.query
  * @param dataBase64 The CSV data as Base64 Encoded String
  */
 data class ImportCSVQuery(
-    val schemaId: String,
+    val schemaId: Long,
     val tableName: String,
     val dataBase64: String
 )

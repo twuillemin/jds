@@ -49,7 +49,8 @@ class DataSourceController(
     val schemaService: SchemaService,
     val serverService: ServerService,
     val groupService: GroupService,
-    val logger: Logger) {
+    val logger: Logger
+) {
 
     /**
      * Return all the dataSources
@@ -59,7 +60,8 @@ class DataSourceController(
     @ApiOperation("Return all the dataSources.")
     @GetMapping
     fun getAllDataSources(
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<DataSource>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<DataSource>> {
 
         logger.debug("getAllDataSources: ${authentication.getLoggingId()}")
 
@@ -87,8 +89,9 @@ class DataSourceController(
     @ApiOperation("Get a DataSource by its id.")
     @GetMapping("{id}")
     fun getDataSourceById(
-        @PathVariable("id") dataSourceId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataSource> {
+        @PathVariable("id") dataSourceId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataSource> {
 
         logger.debug("getDataSourceById($dataSourceId): ${authentication.getLoggingId()}")
 
@@ -118,7 +121,8 @@ class DataSourceController(
     @PostMapping()
     fun createDataSource(
         @RequestBody dataSource: DataSource,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataSource> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataSource> {
 
         logger.debug("createDataSource($dataSource): ${authentication.getLoggingId()}")
 
@@ -147,9 +151,10 @@ class DataSourceController(
     @ApiOperation("Update an existing dataSource.")
     @PutMapping("{id}")
     fun updateDataSource(
-        @PathVariable("id") dataSourceId: String,
+        @PathVariable("id") dataSourceId: Long,
         @RequestBody dataSource: DataSource,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataSource> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataSource> {
 
         logger.debug("updateDataSource($dataSourceId,$dataSource): ${authentication.getLoggingId()}")
 
@@ -182,8 +187,9 @@ class DataSourceController(
     @ApiOperation("Delete a DataSource.")
     @DeleteMapping("{id}")
     fun deleteDataSource(
-        @PathVariable("id") dataSourceId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
+        @PathVariable("id") dataSourceId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Void> {
 
         logger.debug("deleteDataSource($dataSourceId): ${authentication.getLoggingId()}")
 

@@ -40,7 +40,8 @@ class DataAccessService(
     private val schemaService: SchemaService,
     private val sqlDataReader: SQLDataReader,
     private val sqlDataWriter: SQLDataWriter,
-    private val sqlConnectionCache: SQLConnectionCache) {
+    private val sqlConnectionCache: SQLConnectionCache
+) {
 
     /**
      * Get the data from a [DataSource]
@@ -57,7 +58,8 @@ class DataAccessService(
         filter: Predicate? = null,
         orders: List<Order>? = null,
         indexFirstRecord: Int? = null,
-        numberOfRecords: Int? = null): List<Map<String, Any>> {
+        numberOfRecords: Int? = null
+    ): List<Map<String, Any>> {
 
         val dataProvider = dataProviderService.getDataProviderById(dataSource.dataProviderId)
 
@@ -84,7 +86,8 @@ class DataAccessService(
         filter: Predicate? = null,
         orders: List<Order>? = null,
         indexFirstRecord: Int? = null,
-        numberOfRecords: Int? = null): List<Map<String, Any>> {
+        numberOfRecords: Int? = null
+    ): List<Map<String, Any>> {
 
         return when (dataProvider) {
             is DataProviderSQL    -> sqlDataReader.getData(dataProvider, filter, orders)
@@ -101,7 +104,8 @@ class DataAccessService(
      */
     fun insertData(
         dataSource: DataSource,
-        data: Map<String, Any>): Int {
+        data: Map<String, Any>
+    ): Int {
 
         val dataProvider = dataProviderService.getDataProviderById(dataSource.dataProviderId)
 
@@ -122,7 +126,8 @@ class DataAccessService(
      */
     fun massInsertData(
         dataSource: DataSource,
-        data: List<Map<String, Any>>): Int {
+        data: List<Map<String, Any>>
+    ): Int {
 
         val dataProvider = dataProviderService.getDataProviderById(dataSource.dataProviderId)
 
@@ -145,7 +150,8 @@ class DataAccessService(
     fun updateData(
         dataSource: DataSource,
         filter: Predicate,
-        data: Map<String, Any?>): Int {
+        data: Map<String, Any?>
+    ): Int {
 
         return updateData(
             dataProviderService.getDataProviderById(dataSource.dataProviderId),
@@ -165,7 +171,8 @@ class DataAccessService(
         dataProvider: DataProvider,
         filter: Predicate,
         data: Map<String, Any?>,
-        longTransaction: LongTransaction? = null): Int {
+        longTransaction: LongTransaction? = null
+    ): Int {
 
         validateLookupData(dataProvider, listOf(data))
 
@@ -184,11 +191,10 @@ class DataAccessService(
      */
     fun deleteData(
         dataSource: DataSource,
-        filter: Predicate): Int {
+        filter: Predicate
+    ): Int {
 
-        val dataProvider = dataProviderService.getDataProviderById(dataSource.dataProviderId)
-
-        return when (dataProvider) {
+        return when (val dataProvider = dataProviderService.getDataProviderById(dataSource.dataProviderId)) {
             is DataProviderSQL    -> sqlDataWriter.deleteData(dataProvider, filter)
             is DataProviderGSheet -> throw BadParameterException(E.service.access.dataProviderNotSupported, dataProvider::class)
         }
@@ -212,9 +218,7 @@ class DataAccessService(
      */
     fun createLongTransaction(dataProvider: DataProvider): LongTransaction {
 
-        val schema = schemaService.getSchemaById(dataProvider.schemaId)
-
-        return when (schema) {
+        return when (val schema = schemaService.getSchemaById(dataProvider.schemaId)) {
             is SchemaSQL    -> {
                 val connection = sqlConnectionCache.getConnection(schema)
                 connection.autoCommit = false
@@ -237,7 +241,7 @@ class DataAccessService(
 
         val lookupColumnByName = getLookupColumnsByName(dataProvider)
 
-        if (!lookupColumnByName.isEmpty()) {
+        if (lookupColumnByName.isNotEmpty()) {
             val lookupValuesByName = retrieveAllLookups(dataProvider)
             data
                 .forEach { row ->
@@ -263,7 +267,8 @@ class DataAccessService(
         lookupColumnByName: Map<String, ColumnLookup>,
         lookupValuesByName: Map<String, Map<String, String>>,
         name: String,
-        value: Any?) {
+        value: Any?
+    ) {
 
         // If something to test
         value?.let { valueToTest ->

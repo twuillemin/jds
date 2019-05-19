@@ -43,19 +43,24 @@ class SQLModelReaderTest {
     private val sqlDataWriter = SQLDataWriter(schemaService, sqlPredicateConverter, sqlConnectionCache, objectMapper, logger)
     private val sqlModelReader = SQLModelReader(jdbcHelper, sqlConnectionCache, schemaService)
 
+    private val GROUP_ID = 1L
+    private val SERVER_ID = 100L
+    private val SCHEMA_ID = 200L
+    private val DATA_PROVIDER_ID = 300L
+    
     private val serverSQL = ServerSQL(
-        "schemaId",
+        SERVER_ID,
         "testServer",
-        "groupId",
+        GROUP_ID,
         true,
         "jdbc:h2:mem:",
         "sa",
         null)
 
     private val schemaSQL = SchemaSQL(
-        "schemaId",
+        SCHEMA_ID,
         "PUBLIC",
-        "groupId",
+        SERVER_ID,
         null)
 
     @BeforeAll
@@ -290,8 +295,8 @@ class SQLModelReaderTest {
 
     private fun getBasicDataProvider(): DataProviderSQL {
         return DataProviderSQL(
-            "dataProviderId",
-            "schemaId",
+            DATA_PROVIDER_ID,
+            SCHEMA_ID,
             "data provider name",
             listOf(
                 ColumnAttribute(

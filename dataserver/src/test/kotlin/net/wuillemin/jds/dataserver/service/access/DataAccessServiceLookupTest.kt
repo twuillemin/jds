@@ -37,9 +37,16 @@ class DataAccessServiceLookupTest {
     private var sqlConnectionCache = Mockito.mock(SQLConnectionCache::class.java)
 
 
+    private val SCHEMA_ID = 200L
+    private val DATA_PROVIDER_LOOKUP_ID = 300L
+    private val DATA_PROVIDER_TEST_ID = 301L
+    private val DATA_SOURCE_LOOKUP_ID = 400L
+    private val DATA_SOURCE_TEST_ID = 401L
+
+
     private val dataProviderLookup = DataProviderSQL(
-        id = "dataProviderLookupId",
-        schemaId = "schemaId",
+        id = DATA_PROVIDER_LOOKUP_ID,
+        schemaId = SCHEMA_ID,
         name = "The lookup data provider",
         columns = listOf(
             ColumnAttribute("key", DataType.STRING, 100, ReadOnlyStorage("key", false, false, false)),
@@ -49,17 +56,17 @@ class DataAccessServiceLookupTest {
         query = "select * from lookup")
 
     private val dataSourceLookup = DataSource(
-        id = "dataSourceLookupId",
+        id = DATA_SOURCE_LOOKUP_ID,
         name = "The lookup data source",
-        dataProviderId = "dataProviderLookupId",
+        dataProviderId = DATA_PROVIDER_LOOKUP_ID,
         userAllowedToReadIds = emptySet(),
         userAllowedToWriteIds = emptySet(),
         userAllowedToDeleteIds = emptySet())
 
     // The data provider to write
     private val dataProviderTest = DataProviderSQL(
-        id = "dataProviderTestId",
-        schemaId = "data provider test",
+        id = DATA_PROVIDER_TEST_ID,
+        schemaId = SCHEMA_ID,
         name = "The data provider to test",
         columns = listOf(
             ColumnAttribute(
@@ -108,9 +115,9 @@ class DataAccessServiceLookupTest {
 
     // The data source to write
     private val dataSourceTest = DataSource(
-        id = "dataSourceTestId",
+        id = DATA_SOURCE_TEST_ID,
         name = "Data source Test",
-        dataProviderId = "dataProviderTestId",
+        dataProviderId = DATA_PROVIDER_TEST_ID,
         userAllowedToReadIds = emptySet(),
         userAllowedToWriteIds = emptySet(),
         userAllowedToDeleteIds = emptySet())
@@ -118,10 +125,10 @@ class DataAccessServiceLookupTest {
     @Test
     fun `With correct lookups, the insert can be run`() {
 
-        whenever(dataSourceService.getDataSourceById(eq("dataSourceLookupId"))).thenReturn(dataSourceLookup)
-        whenever(dataSourceService.getDataSourceById(eq("dataSourceTestId"))).thenReturn(dataSourceTest)
-        whenever(dataProviderService.getDataProviderById(eq("dataProviderLookupId"))).thenReturn(dataProviderLookup)
-        whenever(dataProviderService.getDataProviderById(eq("dataProviderTestId"))).thenReturn(dataProviderTest)
+        whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_LOOKUP_ID))).thenReturn(dataSourceLookup)
+        whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_TEST_ID))).thenReturn(dataSourceTest)
+        whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_LOOKUP_ID))).thenReturn(dataProviderLookup)
+        whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_TEST_ID))).thenReturn(dataProviderTest)
 
         // The lookup data
         whenever(sqlDataReader.getData(any(), isNull(), isNull(), isNull(), isNull())).thenReturn(
@@ -138,10 +145,10 @@ class DataAccessServiceLookupTest {
     @Test
     fun `Lookup must be provided as list`() {
 
-        whenever(dataSourceService.getDataSourceById(eq("dataSourceLookupId"))).thenReturn(dataSourceLookup)
-        whenever(dataSourceService.getDataSourceById(eq("dataSourceTestId"))).thenReturn(dataSourceTest)
-        whenever(dataProviderService.getDataProviderById(eq("dataProviderLookupId"))).thenReturn(dataProviderLookup)
-        whenever(dataProviderService.getDataProviderById(eq("dataProviderTestId"))).thenReturn(dataProviderTest)
+        whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_LOOKUP_ID))).thenReturn(dataSourceLookup)
+        whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_TEST_ID))).thenReturn(dataSourceTest)
+        whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_LOOKUP_ID))).thenReturn(dataProviderLookup)
+        whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_TEST_ID))).thenReturn(dataProviderTest)
 
         // The lookup data
         whenever(sqlDataReader.getData(any(), isNull(), isNull(), isNull(), isNull())).thenReturn(
@@ -161,10 +168,10 @@ class DataAccessServiceLookupTest {
     @Test
     fun `Lookup must exist`() {
 
-        whenever(dataSourceService.getDataSourceById(eq("dataSourceLookupId"))).thenReturn(dataSourceLookup)
-        whenever(dataSourceService.getDataSourceById(eq("dataSourceTestId"))).thenReturn(dataSourceTest)
-        whenever(dataProviderService.getDataProviderById(eq("dataProviderLookupId"))).thenReturn(dataProviderLookup)
-        whenever(dataProviderService.getDataProviderById(eq("dataProviderTestId"))).thenReturn(dataProviderTest)
+        whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_LOOKUP_ID))).thenReturn(dataSourceLookup)
+        whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_TEST_ID))).thenReturn(dataSourceTest)
+        whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_LOOKUP_ID))).thenReturn(dataProviderLookup)
+        whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_TEST_ID))).thenReturn(dataProviderTest)
 
         // The lookup data
         whenever(sqlDataReader.getData(any(), isNull(), isNull(), isNull(), isNull())).thenReturn(
@@ -184,10 +191,10 @@ class DataAccessServiceLookupTest {
     @Test
     fun `Lookup must respect limit`() {
 
-        whenever(dataSourceService.getDataSourceById(eq("dataSourceLookupId"))).thenReturn(dataSourceLookup)
-        whenever(dataSourceService.getDataSourceById(eq("dataSourceTestId"))).thenReturn(dataSourceTest)
-        whenever(dataProviderService.getDataProviderById(eq("dataProviderLookupId"))).thenReturn(dataProviderLookup)
-        whenever(dataProviderService.getDataProviderById(eq("dataProviderTestId"))).thenReturn(dataProviderTest)
+        whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_LOOKUP_ID))).thenReturn(dataSourceLookup)
+        whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_TEST_ID))).thenReturn(dataSourceTest)
+        whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_LOOKUP_ID))).thenReturn(dataProviderLookup)
+        whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_TEST_ID))).thenReturn(dataProviderTest)
 
         // The lookup data
         whenever(sqlDataReader.getData(any(), isNull(), isNull(), isNull(), isNull())).thenReturn(

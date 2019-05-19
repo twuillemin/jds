@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 /**
  * The repository for [DataProvider] objects
  */
-interface DataProviderRepository : MongoRepository<DataProvider, String> {
+interface DataProviderRepository : MongoRepository<DataProvider, Long> {
 
     /**
      * Return the list of dataProviders referencing the given [Schema] id
@@ -15,7 +15,7 @@ interface DataProviderRepository : MongoRepository<DataProvider, String> {
      * @param schemaId The id of the schema referenced
      * @return the list of data providers referencing the given schema id
      */
-    fun findBySchemaId(schemaId: String): List<DataProvider>
+    fun findBySchemaId(schemaId: Long): List<DataProvider>
 
     /**
      * Return the list of dataProviders referencing the given [Schema] id
@@ -23,6 +23,6 @@ interface DataProviderRepository : MongoRepository<DataProvider, String> {
      * @param schemaIds The id of the schemas referenced
      * @return the list of data providers referencing the given schema ids
      */
-    fun findBySchemaIdIn(schemaIds: List<String>): List<DataProvider>
+    fun findBySchemaIdIn(schemaIds: List<Long>): List<DataProvider>
 
 }

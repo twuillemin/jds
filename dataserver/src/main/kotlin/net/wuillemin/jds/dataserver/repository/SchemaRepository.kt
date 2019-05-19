@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 /**
  * The repository for [Schema] objects
  */
-interface SchemaRepository : MongoRepository<Schema, String> {
+interface SchemaRepository : MongoRepository<Schema, Long> {
 
     /**
      * Return the list of schemas referencing the given [Server] id.
@@ -15,7 +15,7 @@ interface SchemaRepository : MongoRepository<Schema, String> {
      * @param serverId The id of the server referenced
      * @return the list of schema referencing the giver server id
      */
-    fun findByServerId(serverId: String): List<Schema>
+    fun findByServerId(serverId: Long): List<Schema>
 
     /**
      * Return the list of schemas referencing the given [Server] ids.
@@ -23,5 +23,5 @@ interface SchemaRepository : MongoRepository<Schema, String> {
      * @param serverIds The list of ids of the server referenced
      * @return the list of schema referencing the giver server ids
      */
-    fun findByServerIdIn(serverIds: List<String>): List<Schema>
+    fun findByServerIdIn(serverIds: List<Long>): List<Schema>
 }

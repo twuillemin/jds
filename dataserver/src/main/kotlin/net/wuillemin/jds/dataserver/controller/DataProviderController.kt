@@ -63,7 +63,8 @@ class DataProviderController(
     val lookupService: LookupService,
     val modelService: ModelService,
     val csvImport: CSVImporter,
-    val logger: Logger) {
+    val logger: Logger
+) {
 
     /**
      * Return all the dataProviders
@@ -73,7 +74,8 @@ class DataProviderController(
     @ApiOperation("Return all the dataProviders.")
     @GetMapping
     fun getAllDataProviders(
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<DataProvider>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<DataProvider>> {
 
         logger.debug("getAllDataProviders: ${authentication.getLoggingId()}")
 
@@ -100,8 +102,9 @@ class DataProviderController(
     @ApiOperation("Get a DataProvider by its id.")
     @GetMapping("{id}")
     fun getDataProviderById(
-        @PathVariable("id") dataProviderId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataProvider> {
+        @PathVariable("id") dataProviderId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataProvider> {
 
         logger.debug("getDataProviderById($dataProviderId): ${authentication.getLoggingId()}")
 
@@ -127,10 +130,11 @@ class DataProviderController(
      * @param authentication The authentication of the requester
      */
     @ApiOperation("Create a new DataProvider.")
-    @PostMapping()
+    @PostMapping
     fun createDataProvider(
         @RequestBody dataProvider: DataProvider,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataProvider> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataProvider> {
 
         logger.debug("createDataProvider($dataProvider): ${authentication.getLoggingId()}")
 
@@ -158,9 +162,10 @@ class DataProviderController(
     @ApiOperation("Update an existing dataProvider.")
     @PutMapping("{id}")
     fun updateDataProvider(
-        @PathVariable("id") dataProviderId: String,
+        @PathVariable("id") dataProviderId: Long,
         @RequestBody dataProvider: DataProvider,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataProvider> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataProvider> {
 
         logger.debug("updateDataProvider($dataProviderId, $dataProvider): ${authentication.getLoggingId()}")
 
@@ -192,8 +197,9 @@ class DataProviderController(
     @ApiOperation("Delete a DataProvider.")
     @DeleteMapping("{id}")
     fun deleteDataProvider(
-        @PathVariable("id") dataProviderId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
+        @PathVariable("id") dataProviderId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Void> {
 
         logger.debug("deleteDataProvider($dataProviderId): ${authentication.getLoggingId()}")
 
@@ -224,8 +230,9 @@ class DataProviderController(
     @ApiOperation("Get all the data providers for a dataProvider.")
     @GetMapping("{id}/dataSources")
     fun getDataSources(
-        @PathVariable("id") dataProviderId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<DataSource>> {
+        @PathVariable("id") dataProviderId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<DataSource>> {
 
         logger.debug("getDataSources($dataProviderId): ${authentication.getLoggingId()}")
 
@@ -256,8 +263,9 @@ class DataProviderController(
     @ApiOperation("Preview the data and the columns of a DataProvider")
     @GetMapping("{id}/preview")
     fun getDataProviderPreview(
-        @PathVariable("id") dataProviderId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Preview> {
+        @PathVariable("id") dataProviderId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Preview> {
 
         logger.debug("getDataProviderPreview($dataProviderId): ${authentication.getLoggingId()}")
 
@@ -281,7 +289,8 @@ class DataProviderController(
     @PostMapping("importFromSQL")
     fun importFromSQL(
         @RequestBody importSQLQuery: ImportSQLQuery,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataProvider> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataProvider> {
 
         logger.debug("importFromSQL($importSQLQuery): ${authentication.getLoggingId()}")
 
@@ -310,7 +319,8 @@ class DataProviderController(
     @PostMapping("autoImportFromCSV")
     fun autoImportFromCSV(
         @RequestBody importCSVQuery: ImportCSVQuery,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataSource> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataSource> {
 
         logger.debug("autoImportFromCSV($importCSVQuery): ${authentication.getLoggingId()}")
 
@@ -339,10 +349,11 @@ class DataProviderController(
     @ApiOperation("Promote a column as a lookup.")
     @PutMapping("{id}/promoteColumnAsLookup")
     fun promoteColumnAsLookup(
-        @PathVariable("id") dataProviderId: String,
+        @PathVariable("id") dataProviderId: Long,
         @RequestBody query: PromoteColumnToLookupQuery,
         @ApiIgnore locale: Locale,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<DataProvider> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<DataProvider> {
 
         logger.debug("promoteColumnAsLookup($dataProviderId, $query): ${authentication.getLoggingId()}")
 

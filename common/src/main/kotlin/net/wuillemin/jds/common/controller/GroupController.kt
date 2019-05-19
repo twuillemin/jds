@@ -45,7 +45,7 @@ class GroupController(
      * @param authentication The authentication of the requester
      */
     @ApiOperation("Get all the groups")
-    @GetMapping()
+    @GetMapping
     fun getGroups(
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<Group>> {
 
@@ -69,7 +69,7 @@ class GroupController(
     @ApiOperation("Get a single groups")
     @GetMapping("{id}")
     fun getGroupById(
-        @PathVariable("id") groupId: String,
+        @PathVariable("id") groupId: Long,
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Group> {
 
         logger.warn("getGroup: ${authentication.getLoggingId()}")
@@ -89,7 +89,7 @@ class GroupController(
      * @param authentication The authentication of the requester
      */
     @ApiOperation("Create a new group", notes = "The user creating the group is automatically defined as its administrator")
-    @PostMapping()
+    @PostMapping
     fun createGroup(
         @RequestBody group: Group,
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Group> {
@@ -111,8 +111,8 @@ class GroupController(
     @ApiOperation("Update the administrators of a group")
     @PutMapping("{id}/administrators")
     fun setGroupAdministrators(
-        @PathVariable("id") groupId: String,
-        @RequestBody administratorIds: List<String>,
+        @PathVariable("id") groupId: Long,
+        @RequestBody administratorIds: List<Long>,
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Group> {
 
         logger.warn("setGroupAdministrators: ${authentication.getLoggingId()}")
@@ -141,8 +141,8 @@ class GroupController(
     @ApiOperation("Update the users of a group")
     @PutMapping("{id}/users")
     fun setGroupUsers(
-        @PathVariable("id") groupId: String,
-        @RequestBody userIds: List<String>,
+        @PathVariable("id") groupId: Long,
+        @RequestBody userIds: List<Long>,
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Group> {
 
         logger.warn("setGroupUsers: ${authentication.getLoggingId()}")
@@ -170,8 +170,8 @@ class GroupController(
     @ApiOperation("Delete a group")
     @DeleteMapping("{id}")
     fun deleteGroup(
-        @PathVariable("id") id: String,
-        @RequestBody userIds: List<String>,
+        @PathVariable("id") id: Long,
+        @RequestBody userIds: List<Long>,
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
 
         logger.warn("deleteGroup: ${authentication.getLoggingId()}")

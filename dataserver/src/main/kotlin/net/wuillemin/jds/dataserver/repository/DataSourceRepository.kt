@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 /**
  * The repository for [DataSource] objects
  */
-interface DataSourceRepository : MongoRepository<DataSource, String> {
+interface DataSourceRepository : MongoRepository<DataSource, Long> {
 
     /**
      * Return the list of data sources referencing the given [DataProvider] id
@@ -15,7 +15,7 @@ interface DataSourceRepository : MongoRepository<DataSource, String> {
      * @param dataProviderId The id of the data provider referenced
      * @return the list of data sources referencing the given data provider id
      */
-    fun findByDataProviderId(dataProviderId: String): List<DataSource>
+    fun findByDataProviderId(dataProviderId: Long): List<DataSource>
 
     /**
      * Return the list of data sources referencing the given [DataProvider] ids
@@ -23,7 +23,7 @@ interface DataSourceRepository : MongoRepository<DataSource, String> {
      * @param dataProviderIds The id of the data providers referenced
      * @return the list of data sources referencing the given data provider ids
      */
-    fun findByDataProviderIdIn(dataProviderIds: List<String>): List<DataSource>
+    fun findByDataProviderIdIn(dataProviderIds: List<Long>): List<DataSource>
 
     /**
      * Return the list of data sources having the given user id as a reader
@@ -31,5 +31,5 @@ interface DataSourceRepository : MongoRepository<DataSource, String> {
      * @param userId The id of the user
      * @return the list of data sources referencing the given user id
      */
-    fun findByUserAllowedToReadIds(userId: String): List<DataSource>
+    fun findByUserAllowedToReadIds(userId: Long): List<DataSource>
 }

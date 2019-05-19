@@ -64,11 +64,14 @@ open class JWTAuthenticationFilter(
         listOf(
             SimpleGrantedAuthority(Profile.ADMIN.springRoleName),
             SimpleGrantedAuthority(Profile.USER.springRoleName),
-            SimpleGrantedAuthority(Profile.SERVICE.springRoleName)),
+            SimpleGrantedAuthority(Profile.SERVICE.springRoleName)
+        ),
         UserPermission(
-            "Default user",
+            -1,
             emptyList(),
-            emptyList()))
+            emptyList()
+        )
+    )
 
     /**
      * Calls the {@code initFilterBean()} method that might
@@ -190,7 +193,8 @@ open class JWTAuthenticationFilter(
 
         val roles = readStrings(
             rawRoles,
-            localisationService.getMessage(E.security.jwtFilter.rolesNotList, emptyArray(), request.locale))
+            localisationService.getMessage(E.security.jwtFilter.rolesNotList, emptyArray(), request.locale)
+        )
 
         if (roles.isEmpty()) {
             throw BadCredentialsException(localisationService.getMessage(E.security.jwtFilter.rolesEmpty, emptyArray(), request.locale))
@@ -204,21 +208,25 @@ open class JWTAuthenticationFilter(
             val permissionElements = rawPermission as? Map<*, *>
                 ?: throw BadCredentialsException(localisationService.getMessage(E.security.jwtFilter.permissionNotMap, emptyArray(), request.locale))
 
-            val userId = permissionElements["userId"] as? String
+            // userId is always read as an Integer due to serialization
+            val userId = (permissionElements["userId"] as? Int)?.toLong()
                 ?: throw BadCredentialsException(localisationService.getMessage(E.security.jwtFilter.permissionMissingUserId, emptyArray(), request.locale))
 
-            val adminGroupIds = readStrings(
+            val adminGroupIds = readLongs(
                 permissionElements["adminGroupIds"],
-                localisationService.getMessage(E.security.jwtFilter.permissionMissingAdmin, emptyArray(), request.locale))
+                localisationService.getMessage(E.security.jwtFilter.permissionMissingAdmin, emptyArray(), request.locale)
+            )
 
-            val userGroupIds = readStrings(
+            val userGroupIds = readLongs(
                 permissionElements["userGroupIds"],
-                localisationService.getMessage(E.security.jwtFilter.permissionMissingUser, emptyArray(), request.locale))
+                localisationService.getMessage(E.security.jwtFilter.permissionMissingUser, emptyArray(), request.locale)
+            )
 
             UserPermission(
                 userId,
                 adminGroupIds,
-                userGroupIds)
+                userGroupIds
+            )
 
         }
         catch (exception: Exception) {
@@ -228,7 +236,8 @@ open class JWTAuthenticationFilter(
         return AuthenticationToken(
             userName,
             roles.map { SimpleGrantedAuthority(it) },
-            permission)
+            permission
+        )
     }
 
     private fun addAuthenticationIsRequired(username: String): Boolean {
@@ -281,6 +290,24 @@ open class JWTAuthenticationFilter(
         request: HttpServletRequest,
         response: HttpServletResponse,
         failed: AuthenticationException) {
+    }
+
+    /**
+     * A small helper method to read list of longs from the token
+     */
+    private fun readLongs(src: Any?, errorMessage: String): List<Long> {
+
+        // Get the object as a list
+        val rawList = src as? List<*>
+            ?: throw BadCredentialsException(errorMessage)
+
+        // Convert its items
+        return rawList.map {
+            it?.toString()?.toLong()
+                ?: run {
+                    throw BadCredentialsException(errorMessage)
+                }
+        }
     }
 
     /**

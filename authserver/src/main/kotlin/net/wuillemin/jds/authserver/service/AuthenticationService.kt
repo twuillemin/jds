@@ -58,7 +58,7 @@ class AuthenticationService(
                     it.userName,
                     listOf(it.profile),
                     UserPermission(
-                        it.userName,
+                        it.userId,
                         emptyList(),
                         emptyList()))
 

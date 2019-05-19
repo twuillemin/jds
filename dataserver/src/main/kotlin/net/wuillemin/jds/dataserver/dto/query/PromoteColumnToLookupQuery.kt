@@ -12,7 +12,7 @@ package net.wuillemin.jds.dataserver.dto.query
 data class PromoteColumnToLookupQuery(
     val columnName: String,
     val maximumNumberOfLookups: Int,
-    val dataSourceId: String,
+    val dataSourceId: Long,
     val keyColumnName: String,
     val valueColumnName: String
 )

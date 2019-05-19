@@ -31,7 +31,7 @@ class PermissionBuilder(private val groupService: GroupService) {
         return user.id
             ?.let { userId ->
                 // Retrieve all the groups that the user declares itself as member (ensure no duplicate)
-                val groups = groupService.findGroupByIds(user.participatingGroupIds).toSet()
+                val groups = groupService.findGroupByUserId(userId).toSet()
                 // Spit according to if the user is admin of the group or not
                 val partitionAdminOther = groups.partition { it.administratorIds.contains(userId) }
                 // Keep the groups for which the user is admin

@@ -7,4 +7,4 @@ import org.springframework.context.ApplicationEvent
  *
  * @param serverId The object on which the event initially occurred
  */
-class ServerUpdatedEvent(val serverId: String) : ApplicationEvent(serverId)
+class ServerUpdatedEvent(val serverId: Long) : ApplicationEvent(serverId)

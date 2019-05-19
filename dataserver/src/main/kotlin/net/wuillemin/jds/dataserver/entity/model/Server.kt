@@ -15,11 +15,12 @@ import net.wuillemin.jds.common.entity.Loggable
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = ServerSQL::class, name = "SQL"),
-    JsonSubTypes.Type(value = ServerGSheet::class, name = "GSheet"))
+    JsonSubTypes.Type(value = ServerGSheet::class, name = "GSheet")
+)
 sealed class Server(
-    open val id: String?,
+    open val id: Long?,
     open val name: String,
-    open val groupId: String,
+    open val groupId: Long,
     open val customerDefined: Boolean
 ) : Loggable {
 
@@ -44,9 +45,9 @@ sealed class Server(
  */
 data class ServerSQL(
     // Inherited properties
-    override val id: String?,
+    override val id: Long?,
     override val name: String,
-    override val groupId: String,
+    override val groupId: Long,
     override val customerDefined: Boolean,
     // Specific properties
     val jdbcConnectionString: String,
@@ -58,10 +59,10 @@ data class ServerSQL(
         return copy(
             jdbcConnectionString = "*****",
             userName = "*****",
-            password = "*****")
+            password = "*****"
+        )
     }
 }
-
 
 /**
  * Represents a Postgres server
@@ -73,9 +74,9 @@ data class ServerSQL(
  */
 data class ServerGSheet(
     // Inherited properties
-    override val id: String?,
+    override val id: Long?,
     override val name: String,
-    override val groupId: String,
+    override val groupId: Long,
     override val customerDefined: Boolean,
     // Specific properties
     val userName: String,
@@ -89,6 +90,7 @@ data class ServerGSheet(
             userName = "*****",
             password = "*****",
             linkToWorkBook = "*****",
-            accessDetails = emptyMap())
+            accessDetails = emptyMap()
+        )
     }
 }

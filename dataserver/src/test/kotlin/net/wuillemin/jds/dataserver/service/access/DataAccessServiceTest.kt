@@ -31,6 +31,11 @@ class DataAccessServiceTest {
     private var sqlDataWriter = Mockito.mock(SQLDataWriter::class.java)
     private var sqlConnectionCache = Mockito.mock(SQLConnectionCache::class.java)
 
+    private val SCHEMA_ID = 200L
+    private val DATA_PROVIDER_SQL_ID = 300L
+    private val DATA_SOURCE_ID = 400L
+    
+    
     @BeforeEach
     fun beforeEach() {
         dataProviderService = Mockito.mock(DataProviderService::class.java)
@@ -39,17 +44,17 @@ class DataAccessServiceTest {
     }
 
     private val dataProviderSQL = DataProviderSQL(
-        id = "dataProviderSQLId",
-        schemaId = "serverId25",
+        id = DATA_PROVIDER_SQL_ID,
+        schemaId = SCHEMA_ID,
         name = "The SQL data provider",
         columns = emptyList(),
         editable = false,
         query = "select * from table")
 
     private val dataSourceSQL = DataSource(
-        id = "dataSourceId",
+        id = DATA_SOURCE_ID,
         name = "The SQL data provider",
-        dataProviderId = "dataProviderSQLId",
+        dataProviderId = DATA_PROVIDER_SQL_ID,
         userAllowedToReadIds = emptySet(),
         userAllowedToWriteIds = emptySet(),
         userAllowedToDeleteIds = emptySet())
@@ -59,7 +64,7 @@ class DataAccessServiceTest {
 
         val dataAccessService = DataAccessService(dataSourceService, dataProviderService, schemaService, sqlDataReader, sqlDataWriter, sqlConnectionCache)
 
-        whenever(dataProviderService.getDataProviderById("dataProviderSQLId")).thenReturn(dataProviderSQL)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_SQL_ID)).thenReturn(dataProviderSQL)
         whenever(sqlDataReader.getData(eq(dataProviderSQL), isNull(), isNull(), isNull(), isNull())).thenReturn(listOf(emptyMap()))
 
         val result = dataAccessService.getData(dataSourceSQL, null, null)
@@ -72,7 +77,7 @@ class DataAccessServiceTest {
 
         val dataAccessService = DataAccessService(dataSourceService, dataProviderService, schemaService, sqlDataReader, sqlDataWriter, sqlConnectionCache)
 
-        whenever(dataProviderService.getDataProviderById("dataProviderSQLId")).thenReturn(dataProviderSQL)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_SQL_ID)).thenReturn(dataProviderSQL)
         whenever(sqlDataWriter.insertData(eq(dataProviderSQL), eq(emptyMap()))).thenReturn(1)
 
         val result = dataAccessService.insertData(dataSourceSQL, emptyMap())
@@ -85,7 +90,7 @@ class DataAccessServiceTest {
 
         val dataAccessService = DataAccessService(dataSourceService, dataProviderService, schemaService, sqlDataReader, sqlDataWriter, sqlConnectionCache)
 
-        whenever(dataProviderService.getDataProviderById("dataProviderSQLId")).thenReturn(dataProviderSQL)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_SQL_ID)).thenReturn(dataProviderSQL)
         whenever(sqlDataWriter.massInsertData(eq(dataProviderSQL), eq(emptyList()))).thenReturn(25)
 
         val result = dataAccessService.massInsertData(dataSourceSQL, emptyList())
@@ -102,7 +107,7 @@ class DataAccessServiceTest {
             ColumnName("columnName"),
             ColumnName("columnName"))
 
-        whenever(dataProviderService.getDataProviderById("dataProviderSQLId")).thenReturn(dataProviderSQL)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_SQL_ID)).thenReturn(dataProviderSQL)
         whenever(sqlDataWriter.updateData(eq(dataProviderSQL), eq(predicate), eq(emptyMap()), isNull())).thenReturn(15)
 
         val result = dataAccessService.updateData(dataSourceSQL, predicate, emptyMap())
@@ -119,7 +124,7 @@ class DataAccessServiceTest {
             ColumnName("columnName"),
             ColumnName("columnName"))
 
-        whenever(dataProviderService.getDataProviderById("dataProviderSQLId")).thenReturn(dataProviderSQL)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_SQL_ID)).thenReturn(dataProviderSQL)
         whenever(sqlDataWriter.deleteData(eq(dataProviderSQL), eq(predicate))).thenReturn(5)
 
         val result = dataAccessService.deleteData(dataSourceSQL, predicate)

@@ -62,28 +62,35 @@ class LookupServiceTest {
     private val dataAccessService = DataAccessService(dataSourceService, dataProviderService, schemaService, sqlDataReader, sqlDataWriter, sqlConnectionCache)
     private val lookupService: LookupService = LookupService(dataSourceService, dataProviderService, dataAccessService, localisationService, objectMapper)
 
+    private val GROUP_ID = 1L
+    private val SERVER_ID = 100L
+    private val SCHEMA_ID = 200L
+    private val DATA_PROVIDER_TEST_ID = 300L
+    private val DATA_PROVIDER_LOOKUP_ID = 300L
+    private val DATA_SOURCE_LOOKUP_ID = 400L
+    
     // -------------------------------------------------------------
     // Definition of objects (for mocked services)
     // -------------------------------------------------------------
     private val serverSQL = ServerSQL(
-        "serverId",
+        SERVER_ID,
         "testServer",
-        "groupId",
+        GROUP_ID,
         true,
         "jdbc:h2:mem:",
         "sa",
         null)
 
     private val schemaSQL = SchemaSQL(
-        "schemaId",
+        SCHEMA_ID,
         "PUBLIC",
-        "groupId",
+        GROUP_ID,
         null)
 
     private val dataProviderLookup = DataProviderSQL(
-        "lookupDPId",
-        "schemaId",
-        "lookupDPId",
+        DATA_PROVIDER_LOOKUP_ID,
+        SCHEMA_ID,
+        "DATA_PROVIDER_LOOKUP",
         listOf(
             ColumnAttribute("ID", DataType.STRING, 200, ReadOnlyStorage("ID", false, false, false)),
             ColumnAttribute("KEY", DataType.STRING, 200, ReadOnlyStorage("KEY", false, false, false)),
@@ -92,9 +99,9 @@ class LookupServiceTest {
         "SELECT * FROM TABLE_LOOKUP")
 
     private val dataProviderTest = DataProviderSQL(
-        "testDPId",
-        "schemaId",
-        "lookupDPId",
+        DATA_PROVIDER_TEST_ID,
+        SCHEMA_ID,
+        "dataProviderTest",
         listOf(
             ColumnAttribute(
                 "ID",
@@ -121,8 +128,8 @@ class LookupServiceTest {
         "SELECT * FROM table_test")
 
     private val dataSourceLookup = DataSource(
-        "lookupDSId",
-        "lookupDPId",
+        DATA_SOURCE_LOOKUP_ID,
+        DATA_PROVIDER_LOOKUP_ID,
         "lookup data source",
         emptySet(),
         emptySet(),
@@ -161,20 +168,20 @@ class LookupServiceTest {
             connection.commit()
         }
 
-        whenever(dataProviderService.getDataProviderById("lookupDPId")).thenReturn(dataProviderLookup)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_LOOKUP_ID)).thenReturn(dataProviderLookup)
 
-        whenever(dataProviderService.getDataProviderById("testDPId")).thenReturn(dataProviderTest)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_TEST_ID)).thenReturn(dataProviderTest)
 
-        whenever(dataSourceService.getDataSourceById("lookupDSId")).thenReturn(dataSourceLookup)
+        whenever(dataSourceService.getDataSourceById(DATA_SOURCE_LOOKUP_ID)).thenReturn(dataSourceLookup)
 
         whenever(dataProviderService.updateDataProvider(any())).doAnswer { params -> params.getArgument(0) as DataProvider }
 
         val updatedDataProvider = lookupService.promoteColumnToLookup(
-            dataProviderService.getDataProviderById("testDPId"),
+            dataProviderService.getDataProviderById(DATA_PROVIDER_TEST_ID),
             PromoteColumnToLookupQuery(
                 "DATA",
                 5,
-                "lookupDSId",
+                DATA_SOURCE_LOOKUP_ID,
                 "KEY",
                 "VALUE"),
             Locale.getDefault())

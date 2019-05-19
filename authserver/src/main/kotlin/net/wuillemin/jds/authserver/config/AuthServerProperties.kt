@@ -14,16 +14,19 @@ data class AuthServerProperties(
     val privateKey: PrivateKey,
     val tokenTimeToLiveInSeconds: Long,
     val refreshTimeToLiveInSeconds: Long,
-    val localUsers: List<LocalUserProperties>) {
+    val localUsers: List<LocalUserProperties>
+) {
 
     /**
      * The definition of locally given user
      *
+     * @param userId The id of the user
      * @param userName The name of the user
      * @param password The password of the user
      * @param profile The profile of the user
      */
     class LocalUserProperties(
+        var userId: Long,
         var userName: String,
         var password: String,
         var profile: String

@@ -34,7 +34,8 @@ class LookupService(
     private val dataProviderService: DataProviderService,
     private val dataAccessService: DataAccessService,
     private val localisationService: LocalisationService,
-    private val objectMapper: ObjectMapper) {
+    private val objectMapper: ObjectMapper
+) {
 
     /**
      * Promote a column to as a lookup column. The process starts with basic tests (existence of the columns, etc.) that will
@@ -51,7 +52,8 @@ class LookupService(
     fun promoteColumnToLookup(
         dataProvider: DataProvider,
         query: PromoteColumnToLookupQuery,
-        locale: Locale): DataProvider {
+        locale: Locale
+    ): DataProvider {
 
         // Retrieve the needed objects (or die trying)
         val targetDataSource = dataSourceService.getDataSourceById(query.dataSourceId)
@@ -160,7 +162,7 @@ class LookupService(
                             errors.add(localisationService.getMessage(
                                 E.service.model.lookup.tooLargeLookup,
                                 arrayOf(lineId, newStringValue?.length ?: 0, columnToUpdate.size),
-                                locale))
+                                locale                            )                            )
                         }
 
                         // Make a map holding the value to set
@@ -171,7 +173,7 @@ class LookupService(
             }
 
         // If there are errors, throw a constraint exception
-        if (!errors.isEmpty()) {
+        if (errors.isNotEmpty()) {
             throw ConstraintException(E.service.model.lookup.failedToPromoteLookup, query.columnName, errors.joinToString("\n"))
         }
 
@@ -200,9 +202,8 @@ class LookupService(
                     query.maximumNumberOfLookups,
                     query.dataSourceId,
                     query.keyColumnName,
-                    query.valueColumnName)
+                    query.valueColumnName                )
             }
-
         }
 
         // Save the new data provider
@@ -210,6 +211,6 @@ class LookupService(
             when (dataProvider) {
                 is DataProviderSQL    -> dataProvider.copy(columns = newColumns)
                 is DataProviderGSheet -> dataProvider.copy(columns = newColumns)
-            })
+            }        )
     }
 }

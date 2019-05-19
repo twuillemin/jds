@@ -27,7 +27,8 @@ class GroupInitializer(
     private val serverService: ServerService,
     private val schemaService: SchemaService,
     private val dataServerProperties: DataServerProperties,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Create the original SQL environment for a group: Server, Schema, roles, etc.

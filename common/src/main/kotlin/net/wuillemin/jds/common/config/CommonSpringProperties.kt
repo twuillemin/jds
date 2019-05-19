@@ -9,7 +9,6 @@ import net.wuillemin.jds.common.security.ServerReference
 import net.wuillemin.jds.common.security.utils.CertificateFileReader
 import org.slf4j.Logger
 import org.springframework.beans.factory.BeanCreationException
-import org.springframework.boot.autoconfigure.mongo.MongoProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -52,15 +51,34 @@ class CommonSpringProperties(
                 // Get the private key
                 try {
                     certificateFileReader.readDERPublicKey(Paths.get(publicKeyPath))
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     throw BeanCreationException("Unable to read the private key", e)
                 }
-            }
-            else {
+            } else {
                 null
             }
         }
+
+        // Valid the base attributes
+        val jdbcDatabase = database
+            ?.let { db ->
+
+                val url = db.url
+                if (url.isNullOrBlank())
+                    throw BeanCreationException("The property 'url' must not be blank")
+
+                val driverClassName = db.driverClassName
+                if (driverClassName.isNullOrBlank())
+                    throw BeanCreationException("The property 'driverClassName' must not be blank")
+
+                CommonProperties.SQLDatabaseProperties(
+                    url,
+                    db.user,
+                    db.password,
+                    driverClassName
+                )
+            }
+            ?: throw BeanCreationException("The property 'commonDatabase' must not be defined")
 
         // Warn if no public key given
         if (publicKey == null) {
@@ -107,16 +125,15 @@ class CommonSpringProperties(
                 ?: emptyList())
 
         return CommonProperties(
-            database,
+            jdbcDatabase,
             Server(publicKey),
             Client(jwtAuthentication, basicAuthentication, noAuthentication))
     }
 
-
     /**
-     * The definition of the common database
+     * The definition of the database for storing the configuration of the users and groups
      */
-    var database: MongoProperties = MongoProperties()
+    var database: SQLDatabaseProperties? = null
 
     /**
      * The path of to the file holding the private key
@@ -226,5 +243,31 @@ class CommonSpringProperties(
          * The list of servers to connect to
          */
         var servers: List<String?>? = null
+    }
+
+    /**
+     * The configuration for a SQL database
+     */
+    class SQLDatabaseProperties {
+
+        /**
+         * The JDBC connection string
+         */
+        var url: String? = null
+
+        /**
+         * The user
+         */
+        var user: String? = null
+
+        /**
+         * The password
+         */
+        var password: String? = null
+
+        /**
+         * The driver
+         */
+        var driverClassName: String? = null
     }
 }

@@ -23,9 +23,10 @@ import java.util.concurrent.ConcurrentHashMap
 @Service
 class SQLConnectionCache(
     private val serverService: ServerService,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
-    private val connectionPoolBySchemaId = ConcurrentHashMap<String, HikariDataSource>()
+    private val connectionPoolBySchemaId = ConcurrentHashMap<Long, HikariDataSource>()
 
     private val connectionPoolByConnectionInformation = ConcurrentHashMap<ConnectionInformation, HikariDataSource>()
 

@@ -63,6 +63,7 @@ class AuthServerSpringProperties(private val certificateFileReader: CertificateF
         val validLocalUsers = localUsers
             ?.map {
                 AuthServerProperties.LocalUserProperties(
+                    getAttributeLong(it.userId, "userId"),
                     getAttribute(it.userName, "userName"),
                     getAttribute(it.password, "password"),
                     getAttribute(it.profile, "profile"))
@@ -74,6 +75,14 @@ class AuthServerSpringProperties(private val certificateFileReader: CertificateF
             validTokenTimeToLiveInSeconds,
             validRefreshTimeToLiveInSeconds,
             validLocalUsers)
+    }
+
+    /**
+     * A simple function validating that the attribute is present and not blank and converting returning it
+     */
+    fun getAttributeLong(attribute: Long?, attributeName: String): Long {
+        return attribute
+            ?: throw BeanCreationException("One of the locally defined user has its attribute $attributeName not defined")
     }
 
     /**
@@ -114,6 +123,10 @@ class AuthServerSpringProperties(private val certificateFileReader: CertificateF
      * The definition of locally given user
      */
     class LocalUserSpringProperties {
+        /**
+         * The id of the user
+         */
+        var userId: Long? = null
         /**
          * The name of the user
          */

@@ -33,10 +33,10 @@ class DataServerSpringProperties {
         // Valid the base attributes
         val storage = storageDatabases.map { database ->
 
-            database.jdbcConnectionUrl
+            database.url
                 ?.let { jdbcConnectionUrl ->
                     if (jdbcConnectionUrl.isBlank()) {
-                        throw BeanCreationException("The property 'jdbcConnectionUrl' must not be blank")
+                        throw BeanCreationException("The property 'url' must not be blank")
                     }
                     DataServerProperties.SQLDatabaseProperties(
                         jdbcConnectionUrl,
@@ -44,7 +44,7 @@ class DataServerSpringProperties {
                         database.password
                     )
                 }
-                ?: throw BeanCreationException("The property 'jdbcConnectionUrl' must not be null")
+                ?: throw BeanCreationException("The property 'url' must not be null")
         }
 
         if (storage.isEmpty()) {
@@ -72,7 +72,7 @@ class DataServerSpringProperties {
         /**
          * The JDBC connection string
          */
-        var jdbcConnectionUrl: String? = null
+        var url: String? = null
 
         /**
          * The user

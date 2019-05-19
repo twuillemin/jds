@@ -8,7 +8,7 @@ package net.wuillemin.jds.common.security
  * @param userGroupIds The id of the groups that the user is just a simple user
  */
 data class UserPermission(
-    val userId: String,
-    val adminGroupIds: List<String>,
-    val userGroupIds: List<String>
+    val userId: Long,
+    val adminGroupIds: List<Long>,
+    val userGroupIds: List<Long>
 )

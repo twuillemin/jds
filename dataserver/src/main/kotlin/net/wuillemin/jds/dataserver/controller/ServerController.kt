@@ -42,7 +42,8 @@ class ServerController(
     val serverService: ServerService,
     val schemaService: SchemaService,
     val groupService: GroupService,
-    val logger: Logger) {
+    val logger: Logger
+) {
 
     /**
      * Return all the servers
@@ -52,7 +53,8 @@ class ServerController(
     @ApiOperation("Return all the servers.")
     @GetMapping
     fun getAllServers(
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<Server>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<Server>> {
 
         logger.debug("getAllServers: ${authentication.getLoggingId()}")
 
@@ -80,8 +82,9 @@ class ServerController(
     @ApiOperation("Get a Server by its id.")
     @GetMapping("{id}")
     fun getServerById(
-        @PathVariable("id") serverId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Server> {
+        @PathVariable("id") serverId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Server> {
 
         logger.debug("getServerById($serverId): ${authentication.getLoggingId()}")
 
@@ -113,10 +116,11 @@ class ServerController(
      * @param authentication The authentication of the requester
      */
     @ApiOperation("Create a new Server.")
-    @PostMapping()
+    @PostMapping
     fun createServer(
         @RequestBody server: Server,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Server> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Server> {
 
         logger.debug("createServer($server): ${authentication.getLoggingId()}")
 
@@ -145,9 +149,10 @@ class ServerController(
     @ApiOperation("Update an existing server.")
     @PutMapping("{id}")
     fun updateServer(
-        @PathVariable("id") serverId: String,
+        @PathVariable("id") serverId: Long,
         @RequestBody server: Server,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Server> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Server> {
 
         logger.debug("updateServer($serverId,$server): ${authentication.getLoggingId()}")
 
@@ -181,8 +186,9 @@ class ServerController(
     @ApiOperation("Delete a Server.")
     @DeleteMapping("{id}")
     fun deleteServer(
-        @PathVariable("id") serverId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
+        @PathVariable("id") serverId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Void> {
 
         logger.debug("deleteServer($serverId): ${authentication.getLoggingId()}")
 
@@ -214,8 +220,9 @@ class ServerController(
     @ApiOperation("Get all the schemas for a server.")
     @GetMapping("{id}/schemas")
     fun getSchemasById(
-        @PathVariable("id") serverId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<Schema>> {
+        @PathVariable("id") serverId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<Schema>> {
 
         logger.debug("getSchemas($serverId): ${authentication.getLoggingId()}")
 

@@ -53,19 +53,24 @@ class SQLDataWriterTest {
     private val sqlDataWriter = SQLDataWriter(schemaService, sqlPredicateConverter, sqlConnectionCache, objectMapper, logger)
     private val sqlDataReader = SQLDataReader(schemaService, jdbcHelper, sqlHelper, sqlConnectionCache, sqlPredicateConverter, sqlOrderConverter, objectMapper, logger)
 
+    private val GROUP_ID = 1L
+    private val SERVER_ID = 100L
+    private val SCHEMA_ID = 200L
+    private val DATA_PROVIDER_ID = 300L
+    
     private val serverSQL = ServerSQL(
-        "serverId",
+        SERVER_ID,
         "testServer",
-        "groupId",
+        GROUP_ID,
         true,
         "jdbc:h2:mem:",
         "sa",
         null)
 
     private val schemaSQL = SchemaSQL(
-        "schemaId",
+        SCHEMA_ID,
         "PUBLIC",
-        "groupId",
+        GROUP_ID,
         null)
 
     @BeforeAll
@@ -349,8 +354,8 @@ class SQLDataWriterTest {
 
     private fun getBasicDataProvider(): DataProviderSQL {
         return DataProviderSQL(
-            "dataProviderId",
-            "schemaId",
+            DATA_PROVIDER_ID,
+            SCHEMA_ID,
             "data provider name",
             listOf(
                 ColumnAttribute(
@@ -399,8 +404,8 @@ class SQLDataWriterTest {
 
     private fun getAllMandatoryDataProvider(): DataProviderSQL {
         return DataProviderSQL(
-            "dataProviderId",
-            "schemaId",
+            DATA_PROVIDER_ID,
+            SCHEMA_ID,
             "data provider name",
             listOf(
                 ColumnAttribute(
@@ -449,8 +454,8 @@ class SQLDataWriterTest {
 
     private fun getPrimaryKeyToBeProvidedDataProvider(): DataProviderSQL {
         return DataProviderSQL(
-            "dataProviderId",
-            "schemaId",
+            DATA_PROVIDER_ID,
+            SCHEMA_ID,
             "data provider name",
             listOf(
                 ColumnAttribute(
@@ -499,8 +504,8 @@ class SQLDataWriterTest {
 
     private fun getNonEditableDataProvider(): DataProviderSQL {
         return DataProviderSQL(
-            "dataProviderId",
-            "schemaId",
+            DATA_PROVIDER_ID,
+            SCHEMA_ID,
             "data provider name",
             listOf(
                 ColumnAttribute(

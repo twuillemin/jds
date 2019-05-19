@@ -3,7 +3,6 @@ package net.wuillemin.jds.common.service
 import net.wuillemin.jds.common.entity.Group
 import net.wuillemin.jds.common.entity.Profile
 import net.wuillemin.jds.common.entity.User
-import net.wuillemin.jds.common.event.GroupUpdatedEvent
 import net.wuillemin.jds.common.event.UserCreatedEvent
 import net.wuillemin.jds.common.event.UserDeletedEvent
 import net.wuillemin.jds.common.event.UserUpdatedEvent
@@ -34,9 +33,11 @@ import org.springframework.stereotype.Service
 class UserService(
     private val userRepository: UserRepository,
     private val groupRepository: GroupRepository,
+    private val groupService: GroupService,
     private val passwordEncoder: PasswordEncoder,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Get the list of all users.
@@ -53,7 +54,7 @@ class UserService(
      * @param id The id of the user
      * @return the user
      */
-    fun getUserById(id: String): User {
+    fun getUserById(id: Long): User {
         return userRepository.findById(id).orElseThrow {
             NotFoundException(C.notFound.idClass, id, User::class)
         }
@@ -66,7 +67,7 @@ class UserService(
      * @param ids a set of user ids
      * @return the users
      */
-    fun getUserByIds(ids: Set<String>): List<User> {
+    fun getUserByIds(ids: Set<Long>): List<User> {
 
         val users = userRepository.findAllById(ids).toList()
 
@@ -86,7 +87,7 @@ class UserService(
      */
     fun getUserByUserName(userName: String): User {
         // Get the user with the wanted userName
-        val users = userRepository.findByUserName(userName)
+        val users = userRepository.findAllByName(userName)
         return when (users.size) {
             0    -> throw throw NotFoundException(C.notFound.valueAttributeClass, userName, "name", User::class)
             1    -> users[0]
@@ -126,12 +127,8 @@ class UserService(
             }
             ?: run {
 
-                if (userRepository.findByUserName(user.userName).isNotEmpty()) {
+                if (userRepository.findAllByName(user.userName).isNotEmpty()) {
                     throw ConstraintException(E.service.user.createNameAlreadyExists)
-                }
-
-                if (user.participatingGroupIds.isNotEmpty()) {
-                    throw BadParameterException(E.service.user.createUserWithGroupsNotEmpty)
                 }
 
                 userRepository
@@ -190,12 +187,8 @@ class UserService(
      */
     private fun updateUser(user: User, existingUser: User): User {
 
-        if (user.participatingGroupIds != existingUser.participatingGroupIds) {
-            throw BadParameterException(E.service.user.updateWithModifiedGroups)
-        }
-
         if (user.userName != existingUser.userName) {
-            if (userRepository.findByUserName(user.userName).isNotEmpty()) {
+            if (userRepository.findAllByName(user.userName).isNotEmpty()) {
                 throw ConstraintException(E.service.user.updateNameAlreadyExists)
             }
         }
@@ -219,7 +212,7 @@ class UserService(
         user.id
             ?.let { userId ->
 
-                val groups = groupRepository.findAllById(user.participatingGroupIds)
+                val groups = groupRepository.findAllByUserId(userId)
 
                 val orphanGroups = groups.filter { (it.administratorIds - userId).isEmpty() }
                 if (orphanGroups.isNotEmpty()) {
@@ -227,21 +220,12 @@ class UserService(
                 }
 
                 // Remove the user from the groups
-                groups.forEach { group ->
-                    groupRepository
-                        .save(
-                            group.copy(
-                                administratorIds = group.administratorIds - userId,
-                                userIds = group.userIds - userId))
-                }
+                groups.forEach { group -> groupService.removeUserFromGroup(group, user) }
 
                 // Delete the user
                 userRepository.delete(user)
 
                 // Inform the world
-                user.participatingGroupIds.forEach { groupId ->
-                    applicationEventPublisher.publishEvent(GroupUpdatedEvent(groupId))
-                }
                 applicationEventPublisher.publishEvent(UserDeletedEvent(userId))
 
                 logger.info("deleteUser: The user ${user.getLoggingId()} was deleted")

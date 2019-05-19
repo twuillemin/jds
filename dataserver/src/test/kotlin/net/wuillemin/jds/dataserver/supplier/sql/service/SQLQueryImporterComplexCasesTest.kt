@@ -46,19 +46,23 @@ class SQLQueryImporterComplexCasesTest {
     private val sqlModelReader = SQLModelReader(jdbcHelper, sqlConnectionCache, schemaService)
     private val sqlQueryImporter = SQLQueryImporter(sqlHelper, sqlModelReader)
 
+    private val GROUP_ID = 1L
+    private val SERVER_ID = 100L
+    private val SCHEMA_ID = 200L
+
     private val serverSQL = ServerSQL(
-        "serverId",
+        SERVER_ID,
         "testServer",
-        "groupId",
+        GROUP_ID,
         true,
         "jdbc:h2:mem:",
         "sa",
         null)
 
     private val schemaSQL = SchemaSQL(
-        "schemaId",
+        SCHEMA_ID,
         "PUBLIC",
-        "groupId",
+        SERVER_ID,
         null)
 
     @BeforeAll

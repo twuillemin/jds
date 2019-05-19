@@ -15,12 +15,12 @@ import net.wuillemin.jds.common.entity.Loggable
  * to write are automatically added the the users allowed to read and write if not present
 */
 data class DataSource(
-    val id: String?,
-    val dataProviderId: String,
+    val id: Long?,
+    val dataProviderId: Long,
     val name: String,
-    val userAllowedToReadIds: Set<String>,
-    val userAllowedToWriteIds: Set<String>,
-    val userAllowedToDeleteIds: Set<String>
+    val userAllowedToReadIds: Set<Long>,
+    val userAllowedToWriteIds: Set<Long>,
+    val userAllowedToDeleteIds: Set<Long>
 ) : Loggable {
 
     override fun getLoggingId(): String {

@@ -8,7 +8,7 @@ package net.wuillemin.jds.dataserver.dto.query
  * @param query The query to execute
  */
 data class ImportSQLQuery(
-    val schemaId: String,
+    val schemaId: Long,
     val name: String,
     val query: String
 )

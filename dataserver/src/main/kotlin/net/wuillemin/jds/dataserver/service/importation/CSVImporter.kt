@@ -29,7 +29,8 @@ class CSVImporter(
     private val modelService: ModelService,
     private val dataProviderService: DataProviderService,
     private val dataSourceService: DataSourceService,
-    private val dataAccessService: DataAccessService) {
+    private val dataAccessService: DataAccessService
+) {
 
     /**
      * Try to import auto-magically a CSV file
@@ -61,25 +62,26 @@ class CSVImporter(
         // Ensure there is unique id column or add it
         columnByName["id"] = columnByName["id"]
             ?.let { column ->
-                column.copy(storageDetail =
-                    when(column.storageDetail){
+                column.copy(
+                    storageDetail =
+                    when (column.storageDetail) {
                         is WritableStorage -> column.storageDetail.copy(primaryKey = true)
                         is ReadOnlyStorage -> column.storageDetail.copy(primaryKey = true)
                     })
             }
             ?: run {
-            ColumnAttribute(
-                "id",
-                DataType.LONG,
-                8,
-                WritableStorage(
-                    tableName,
+                ColumnAttribute(
                     "id",
-                    "id",
-                    false,
-                    true,
-                    true))
-        }
+                    DataType.LONG,
+                    8,
+                    WritableStorage(
+                        tableName,
+                        "id",
+                        "id",
+                        false,
+                        true,
+                        true))
+            }
 
         // Create the table
         modelService.createTable(schema, tableName, columnByName.values.toList())
@@ -125,7 +127,7 @@ class CSVImporter(
             columnNames
                 .mapNotNull { columnName ->
                     record[columnName]?.let { value ->
-                        if(value.trim().isNotBlank()) {
+                        if (value.trim().isNotBlank()) {
                             columnName to value
                         }
                         else {

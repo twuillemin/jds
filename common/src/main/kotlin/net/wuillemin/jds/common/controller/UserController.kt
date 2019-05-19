@@ -41,7 +41,7 @@ class UserController(
      * @param authentication The authentication of the requester
      */
     @ApiOperation("Get all the users of the application")
-    @GetMapping()
+    @GetMapping
     fun getUsers(
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<User>> {
 
@@ -67,7 +67,7 @@ class UserController(
     @ApiOperation("Get a single user by its id")
     @GetMapping("{id}")
     fun getUserById(
-        @PathVariable("id") userId: String,
+        @PathVariable("id") userId: Long,
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<User> {
 
         logger.debug("getById: ${authentication.getLoggingId()}")
@@ -94,7 +94,7 @@ class UserController(
     @ApiOperation("Update an existing user")
     @PutMapping("{id}")
     fun updateUser(
-        @PathVariable("id") userId: String,
+        @PathVariable("id") userId: Long,
         @RequestBody user: User,
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<User> {
 
@@ -130,7 +130,7 @@ class UserController(
     @ApiOperation("Delete an existing user")
     @DeleteMapping("{id}")
     fun deleteUser(
-        @PathVariable("id") userId: String,
+        @PathVariable("id") userId: Long,
         @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
 
         logger.debug("deleteUser: ${authentication.getLoggingId()}")

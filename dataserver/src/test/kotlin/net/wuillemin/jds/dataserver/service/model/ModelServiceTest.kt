@@ -27,6 +27,10 @@ class ModelServiceTest {
     private var sqlQueryImporter: SQLQueryImporter = mock(SQLQueryImporter::class.java)
     private var dataProviderService: DataProviderService = mock(DataProviderService::class.java)
 
+    private val SERVER_SQL_ID = 100L
+    private val SERVER_GSHEET_ID = 101L
+    private val SCHEMA_SQL_ID = 200L
+
     @BeforeEach
     fun beforeEach() {
         sqlQueryImporter = mock(SQLQueryImporter::class.java)
@@ -42,14 +46,14 @@ class ModelServiceTest {
         val modelImporter = ModelService(sqlModelReader, sqlModelWriter, sqlQueryImporter, dataProviderService)
 
         val schema = SchemaSQL(
-            id = "schemaId25",
+            id = SCHEMA_SQL_ID,
             name = "PUBLIC",
-            serverId = "serverId",
+            serverId = SERVER_SQL_ID,
             roleName = null)
 
         val dataProvider = DataProviderSQL(
             id = null,
-            schemaId = "serverId25",
+            schemaId = SCHEMA_SQL_ID,
             name = "The name to create",
             columns = emptyList(),
             editable = false,
@@ -82,7 +86,7 @@ class ModelServiceTest {
                 SchemaGSheet(
                     id = null,
                     name = "name",
-                    serverId = "serverGSheetId"),
+                    serverId = SERVER_GSHEET_ID),
                 "name",
                 "select * from table")
         }
