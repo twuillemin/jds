@@ -78,9 +78,9 @@ class GroupRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate:
     }
 
     /**
-     * Search all groups related to the given user id by its name.
+     * Search all groups related to the given user id.
      *
-     * @param name The name to search
+     * @param userId The id of the user
      * @return a list of group object, that should contain 1 object is the group is found
      */
     fun findAllByUserId(userId: Long): List<Group> {
@@ -149,7 +149,8 @@ class GroupRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate:
      * Deletes all entities managed by the repository.
      */
     override fun deleteAll() {
-        jdbcTemplate.execute("TRUNCATE TABLE jds_group")
+        jdbcTemplate.execute("TRUNCATE TABLE jds_group_user")
+        jdbcTemplate.execute("DELETE FROM jds_group")
     }
 
     /**
@@ -158,8 +159,13 @@ class GroupRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate:
      * @param groups The groups to delete
      */
     override fun deleteAll(groups: Iterable<Group>) {
+
         namedTemplate.update(
-            "DELETE FROM jds_group WHERE id IN (:ids)",
+            "DELETE FROM jds_group_user WHERE group_id IN (:ids)",
+            MapSqlParameterSource("ids", groups.mapNotNull { it.id }))
+
+        namedTemplate.update(
+            "DELETE FROM jds_group_user WHERE id IN (:ids)",
             MapSqlParameterSource("ids", groups.mapNotNull { it.id }))
     }
 
@@ -171,9 +177,16 @@ class GroupRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate:
     override fun delete(group: Group) {
         group.id
             ?.let { groupId ->
+
+                jdbcTemplate.update(
+                    "DELETE FROM jds_group_user WHERE group_id = ?",
+                    arrayOf<Any>(groupId),
+                    arrayOf(java.sql.Types.BIGINT).toIntArray())
+
                 jdbcTemplate.update(
                     "DELETE FROM jds_group WHERE id = ?",
-                    arrayOf<Any>(groupId))
+                    arrayOf<Any>(groupId),
+                    arrayOf(java.sql.Types.BIGINT).toIntArray())
             }
             ?: throw IllegalArgumentException("Unable to delete a non persisted Group object")
     }
@@ -185,8 +198,14 @@ class GroupRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate:
      */
     override fun deleteById(id: Long) {
         jdbcTemplate.update(
+            "DELETE FROM jds_group_user WHERE group_id = ?",
+            arrayOf<Any>(id),
+            arrayOf(java.sql.Types.BIGINT).toIntArray())
+
+        jdbcTemplate.update(
             "DELETE FROM jds_group WHERE id = ?",
-            arrayOf<Any>(id))
+            arrayOf<Any>(id),
+            arrayOf(java.sql.Types.BIGINT).toIntArray())
     }
 
     /**
@@ -223,7 +242,8 @@ class GroupRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate:
         // Delete old relations
         jdbcTemplate.update(
             "DELETE FROM jds_group_user WHERE group_id = ?",
-            arrayOf<Any>(groupId))
+            arrayOf<Any>(groupId),
+            arrayOf(java.sql.Types.BIGINT).toIntArray())
 
         val adminIds = group.administratorIds.toList()
         val userIds = (group.userIds - group.administratorIds).toList()

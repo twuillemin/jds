@@ -12,7 +12,8 @@ package net.wuillemin.jds.common.exception
  */
 class BadParameterException(
     val code: ExceptionCode,
-    vararg val args: Any?) : RuntimeException() {
+    vararg val args: Any?
+) : RuntimeException() {
 
     companion object {
         private const val serialVersionUID = 1L

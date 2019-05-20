@@ -13,7 +13,7 @@ import net.wuillemin.jds.common.entity.Loggable
  * write are automatically added the the users allowed to read if not present
  * @param userAllowedToDeleteIds The list of ids of the users who can delete objects of the DataSource. Users allowed
  * to delete are automatically added the the users allowed to read and write if not present
-*/
+ */
 data class DataSource(
     val id: Long?,
     val name: String,

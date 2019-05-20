@@ -62,7 +62,8 @@ class JWTAuthenticationEntryPoint : AuthenticationEntryPoint, InitializingBean {
     override fun commence(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        authException: AuthenticationException) {
+        authException: AuthenticationException
+    ) {
 
         response.addHeader("WWW-Authenticate", "JWT realm=\"$realmName\"")
         response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.reasonPhrase)

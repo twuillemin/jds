@@ -31,7 +31,8 @@ import java.time.Instant
 @Service
 class ClientHttpRequestAuthenticatorJwt(
     private val commonProperties: CommonProperties,
-    private val logger: Logger) : ClientHttpRequestAuthenticator {
+    private val logger: Logger
+) : ClientHttpRequestAuthenticator {
 
     private var restTemplate = RestTemplate()
 
@@ -41,7 +42,8 @@ class ClientHttpRequestAuthenticatorJwt(
     override fun addAuthentication(
         request: HttpRequest,
         body: ByteArray,
-        execution: ClientHttpRequestExecution) {
+        execution: ClientHttpRequestExecution
+    ) {
 
         // Get the id of the server
         val serverId = ServerReference(request.uri.host, request.uri.port)
@@ -204,7 +206,8 @@ class ClientHttpRequestAuthenticatorJwt(
         val authenticationServerURI: URI,
         val userName: String,
         val password: String,
-        val tokenResponse: TokenResponse?)
+        val tokenResponse: TokenResponse?
+    )
 
 }
 

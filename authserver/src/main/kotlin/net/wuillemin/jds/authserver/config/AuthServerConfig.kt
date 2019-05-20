@@ -15,7 +15,8 @@ import org.springframework.context.support.ResourceBundleMessageSource
     "net.wuillemin.jds.authserver.service"])
 @EnableConfigurationProperties(AuthServerSpringProperties::class)
 class AuthServerConfig(
-    resourceBundleMessageSource: ResourceBundleMessageSource) {
+    resourceBundleMessageSource: ResourceBundleMessageSource
+) {
 
     init {
         resourceBundleMessageSource.addBasenames("messages/authserver_messages")

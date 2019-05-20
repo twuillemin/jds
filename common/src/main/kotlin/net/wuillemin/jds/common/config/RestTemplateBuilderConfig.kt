@@ -14,7 +14,8 @@ import org.springframework.context.annotation.DependsOn
 @Configuration
 class RestTemplateBuilderConfig(
     private val clientHttpRequestInterceptorAuthentication: ClientHttpRequestInterceptorAuthentication,
-    private val clientHttpRequestInterceptorLogger: ClientHttpRequestInterceptorLogger) {
+    private val clientHttpRequestInterceptorLogger: ClientHttpRequestInterceptorLogger
+) {
 
     /**
      * Create a RestTemplateCustomizer bean that will be taken automatically for creating RestTemplate objects

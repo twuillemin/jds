@@ -18,25 +18,26 @@ import java.sql.SQLException
 import java.sql.Statement
 import java.util.*
 
+// Definition of constants
+private const val ALLOWED_READ = "R"
+private const val ALLOWED_WRITE = "W"
+private const val ALLOWED_DELETE = "D"
+
 /**
  * The repository of the [DataSource]s that are stored in the database
  */
 @Suppress("SqlResolve")
 @Repository
-class DataSourceRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate: JdbcTemplate) : CrudRepository<DataSource, Long> {
+class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate) : CrudRepository<DataSource, Long> {
 
 
     private val dataSourceSelectColumns = "id, name, data_provider_id"
     private val dataSourceRowMapper = DataSourceRowMapper()
 
-    private val userRightSelectColumns = "user_id, authorization"
+    private val userRightSelectColumns = "user_id, permission"
     private val userRightRowMapper = UserRightRowMapper()
 
     private val namedTemplate = NamedParameterJdbcTemplate(jdbcTemplate.dataSource!!)
-
-    private val ALLOWED_READ = "R"
-    private val ALLOWED_WRITE = "W"
-    private val ALLOWED_DELETE = "D"
 
     /**
      * Returns the number of dataSources available.
@@ -101,7 +102,7 @@ class DataSourceRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemp
      * @param userId The id of the user
      * @return the list of data sources referencing the given user id
      */
-    fun findByUserAllowedToReadIds(userId: Long): List<DataSource>{
+    fun findByUserAllowedToReadIds(userId: Long): List<DataSource> {
 
         return jdbcTemplate.query(
             "SELECT $dataSourceSelectColumns FROM jds_datasource WHERE id IN (SELECT DISTINCT(data_source_id) FROM jds_datasource_user WHERE user_id = ?)",
@@ -267,24 +268,26 @@ class DataSourceRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemp
 
         // Save the users
         this.jdbcTemplate.batchUpdate(
-            "INSERT INTO jds_datasource_user(data_source_id, user_id, authorization) VALUES(?, ?, ?)",
+            "INSERT INTO jds_datasource_user(data_source_id, user_id, permission) VALUES(?, ?, ?)",
             object : BatchPreparedStatementSetter {
 
                 @Throws(SQLException::class)
                 override fun setValues(ps: PreparedStatement, i: Int) {
                     ps.setLong(1, dataSourceId)
 
-                    if (i < deleterIds.size) {
-                        ps.setLong(2, deleterIds[i])
-                        ps.setString(3, ALLOWED_DELETE)
-                    }
-                    else if (i < deleterIds.size + writerIds.size) {
-                        ps.setLong(2, writerIds[i - deleterIds.size])
-                        ps.setString(3, ALLOWED_WRITE)
-                    }
-                    else {
-                        ps.setLong(2, readerIds[i - writerIds.size - deleterIds.size])
-                        ps.setString(3, ALLOWED_READ)
+                    when {
+                        i < deleterIds.size                  -> {
+                            ps.setLong(2, deleterIds[i])
+                            ps.setString(3, ALLOWED_DELETE)
+                        }
+                        i < deleterIds.size + writerIds.size -> {
+                            ps.setLong(2, writerIds[i - deleterIds.size])
+                            ps.setString(3, ALLOWED_WRITE)
+                        }
+                        else                                 -> {
+                            ps.setLong(2, readerIds[i - writerIds.size - deleterIds.size])
+                            ps.setString(3, ALLOWED_READ)
+                        }
                     }
                 }
 
@@ -334,7 +337,7 @@ class DataSourceRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemp
             val dataProviderId = rs.getLong(3)
 
             val userRights = jdbcTemplate.query(
-                "SELECT $userRightRowMapper FROM jds_datasource_user WHERE data_source_id = ?",
+                "SELECT $userRightSelectColumns FROM jds_datasource_user WHERE data_source_id = ?",
                 arrayOf<Any>(id),
                 userRightRowMapper)
 

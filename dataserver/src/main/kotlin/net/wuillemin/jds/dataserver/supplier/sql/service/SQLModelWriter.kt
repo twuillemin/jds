@@ -24,7 +24,8 @@ class SQLModelWriter(private val sqlConnectionCache: SQLConnectionCache) {
     fun createTable(
         schema: SchemaSQL,
         tableName: String,
-        columns: List<ColumnAttribute>) {
+        columns: List<ColumnAttribute>
+    ) {
 
         // Convert the columns
         val columnsStr = columns.map { (columnName, dataType, size, containerDetails) ->

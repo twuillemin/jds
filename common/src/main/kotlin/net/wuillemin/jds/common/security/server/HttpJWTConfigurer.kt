@@ -32,7 +32,8 @@ import java.util.*
  */
 class HttpJWTConfigurer<B : HttpSecurityBuilder<B>>(
     private val localisationService: LocalisationService,
-    private val publicKey: PublicKey?) : AbstractHttpConfigurer<HttpJWTConfigurer<B>, B>() {
+    private val publicKey: PublicKey?
+) : AbstractHttpConfigurer<HttpJWTConfigurer<B>, B>() {
 
     companion object {
         private val X_REQUESTED_WITH = RequestHeaderRequestMatcher("X-Requested-With", "XMLHttpRequest")

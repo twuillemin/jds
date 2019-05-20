@@ -26,7 +26,8 @@ import java.nio.file.Paths
 @ConfigurationProperties(CommonSpringProperties.CONTEXT)
 class CommonSpringProperties(
     private val certificateFileReader: CertificateFileReader,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     // Declare class constants
     companion object {
@@ -51,10 +52,12 @@ class CommonSpringProperties(
                 // Get the private key
                 try {
                     certificateFileReader.readDERPublicKey(Paths.get(publicKeyPath))
-                } catch (e: Exception) {
+                }
+                catch (e: Exception) {
                     throw BeanCreationException("Unable to read the private key", e)
                 }
-            } else {
+            }
+            else {
                 null
             }
         }

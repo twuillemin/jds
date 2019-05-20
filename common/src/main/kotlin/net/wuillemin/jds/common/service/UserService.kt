@@ -86,7 +86,7 @@ class UserService(
      * @return the user
      */
     fun getUserByUserName(userName: String): User {
-        // Get the user with the wanted userName
+        // Get the user with the wanted name
         val users = userRepository.findAllByName(userName)
         return when (users.size) {
             0    -> throw throw NotFoundException(C.notFound.valueAttributeClass, userName, "name", User::class)
@@ -127,7 +127,7 @@ class UserService(
             }
             ?: run {
 
-                if (userRepository.findAllByName(user.userName).isNotEmpty()) {
+                if (userRepository.findAllByName(user.name).isNotEmpty()) {
                     throw ConstraintException(E.service.user.createNameAlreadyExists)
                 }
 
@@ -187,8 +187,8 @@ class UserService(
      */
     private fun updateUser(user: User, existingUser: User): User {
 
-        if (user.userName != existingUser.userName) {
-            if (userRepository.findAllByName(user.userName).isNotEmpty()) {
+        if (user.name != existingUser.name) {
+            if (userRepository.findAllByName(user.name).isNotEmpty()) {
                 throw ConstraintException(E.service.user.updateNameAlreadyExists)
             }
         }

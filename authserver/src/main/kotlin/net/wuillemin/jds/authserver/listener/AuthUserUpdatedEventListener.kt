@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component
 @Component
 class AuthUserUpdatedEventListener(
     private val tokenGenerator: TokenGenerator,
-    private val logger: Logger) : ApplicationListener<UserUpdatedEvent> {
+    private val logger: Logger
+) : ApplicationListener<UserUpdatedEvent> {
 
     /**
      * Process the event

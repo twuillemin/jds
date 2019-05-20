@@ -38,7 +38,8 @@ class SQLModelReader(
     /**
      * The service for managing the [Schema]
      */
-    private val schemaService: SchemaService) {
+    private val schemaService: SchemaService
+) {
 
     /**
      * Get the tables from a schema

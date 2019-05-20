@@ -71,10 +71,10 @@ class SQLPredicateConverter(private val contextBuilder: PredicateContextBuilder)
 
         return when (predicate) {
             is And                -> {
-                val intermediates = predicate.predicates.map { it -> convertRequestElement(context, it) }.toList()
+                val intermediates = predicate.predicates.map { convertRequestElement(context, it) }.toList()
                 ConvertedRequestElement(
                     intermediates.joinToString(prefix = "( (", separator = ") AND (", postfix = ") )") { it.sql },
-                    intermediates.flatMap { it -> it.values }.toList())
+                    intermediates.flatMap { it.values }.toList())
             }
             is Contains           -> {
                 val column = convertRequestElement(context, predicate.column)
@@ -143,10 +143,10 @@ class SQLPredicateConverter(private val contextBuilder: PredicateContextBuilder)
                 ConvertedRequestElement("${column.sql} NOT IN ($sqls)", values)
             }
             is Or                 -> {
-                val intermediates = predicate.predicates.map { it -> convertRequestElement(context, it) }.toList()
+                val intermediates = predicate.predicates.map { convertRequestElement(context, it) }.toList()
                 ConvertedRequestElement(
                     intermediates.joinToString(prefix = "( (", separator = ") OR (", postfix = ") )") { it.sql },
-                    intermediates.flatMap { it -> it.values }.toList())
+                    intermediates.flatMap { it.values }.toList())
             }
             is StartsWith         -> {
                 val column = convertRequestElement(context, predicate.column)
@@ -205,8 +205,7 @@ class SQLPredicateConverter(private val contextBuilder: PredicateContextBuilder)
      * @return the result of the conversion function
      */
     private fun updateValueString(value: ConvertedRequestElement, conversion: (String) -> String): String {
-        val base = value.values.firstOrNull()
-        return when (base) {
+        return when (val base = value.values.firstOrNull()) {
             is String -> conversion(base)
             else      -> throw BadParameterException(E.supplier.sql.util.converterLikeNotOnString)
         }
@@ -214,14 +213,12 @@ class SQLPredicateConverter(private val contextBuilder: PredicateContextBuilder)
 
     /**
      * The result of a converted request
+     *
+     * @param sql The SQL code generated for this element
+     * @param values The list of values to be set in the prepare statement
      */
     data class ConvertedRequestElement(
-        /**
-         * The SQL code generated for this element
-         */
         val sql: String,
-        /**
-         * The list of values to be set in the prepare statement
-         */
-        val values: List<Any>)
+        val values: List<Any>
+    )
 }

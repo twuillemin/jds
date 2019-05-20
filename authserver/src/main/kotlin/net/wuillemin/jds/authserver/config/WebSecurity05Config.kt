@@ -12,7 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 @Order(5)
 class WebSecurity05Config(
-    private val logger: Logger) : WebSecurityConfigurerAdapter() {
+    private val logger: Logger
+) : WebSecurityConfigurerAdapter() {
 
     /**
      * Override this method to configure the {@link HttpSecurity}. Typically subclasses

@@ -29,6 +29,12 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val SERVER_ID = 100L
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_ID = 300L
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SQLQueryImporterBasicCasesTest {
 
@@ -45,11 +51,6 @@ class SQLQueryImporterBasicCasesTest {
     private val sqlDataWriter = SQLDataWriter(schemaService, sqlPredicateConverter, sqlConnectionCache, objectMapper, logger)
     private val sqlModelReader = SQLModelReader(jdbcHelper, sqlConnectionCache, schemaService)
     private val sqlQueryImporter = SQLQueryImporter(sqlHelper, sqlModelReader)
-
-    private val GROUP_ID = 1L
-    private val SERVER_ID = 100L
-    private val SCHEMA_ID = 200L
-    private val DATA_PROVIDER_ID = 300L
 
     private val serverSQL = ServerSQL(
         SERVER_ID,
@@ -98,7 +99,7 @@ class SQLQueryImporterBasicCasesTest {
             query)
 
         Assertions.assertEquals("name", dataProvider.name)
-        Assertions.assertEquals(serverSQL.id, dataProvider.schemaId)
+        Assertions.assertEquals(schemaSQL.id, dataProvider.schemaId)
         Assertions.assertEquals(query, dataProvider.query)
 
         val columnByName = dataProvider.columns.map { it.name.toLowerCase() to it }.toMap()
@@ -171,7 +172,7 @@ class SQLQueryImporterBasicCasesTest {
             query)
 
         Assertions.assertEquals("name", dataProvider.name)
-        Assertions.assertEquals(serverSQL.id, dataProvider.schemaId)
+        Assertions.assertEquals(schemaSQL.id, dataProvider.schemaId)
         Assertions.assertEquals(query, dataProvider.query)
 
         val columnByName = dataProvider.columns.map { it.name.toLowerCase() to it }.toMap()
@@ -200,7 +201,7 @@ class SQLQueryImporterBasicCasesTest {
             query)
 
         Assertions.assertEquals("name", dataProvider.name)
-        Assertions.assertEquals(serverSQL.id, dataProvider.schemaId)
+        Assertions.assertEquals(schemaSQL.id, dataProvider.schemaId)
         Assertions.assertEquals(query, dataProvider.query)
 
         val columnByName = dataProvider.columns.map { it.name.toLowerCase() to it }.toMap()
@@ -238,7 +239,7 @@ class SQLQueryImporterBasicCasesTest {
             query)
 
         Assertions.assertEquals("name", dataProvider.name)
-        Assertions.assertEquals(serverSQL.id, dataProvider.schemaId)
+        Assertions.assertEquals(schemaSQL.id, dataProvider.schemaId)
         Assertions.assertEquals(query, dataProvider.query)
 
         val columnByName = dataProvider.columns.map { it.name to it }.toMap()
@@ -274,7 +275,7 @@ class SQLQueryImporterBasicCasesTest {
             query)
 
         Assertions.assertEquals("name", dataProvider.name)
-        Assertions.assertEquals(serverSQL.id, dataProvider.schemaId)
+        Assertions.assertEquals(schemaSQL.id, dataProvider.schemaId)
         Assertions.assertEquals(query, dataProvider.query)
 
         val columnByName = dataProvider.columns.map { it.name to it }.toMap()
@@ -311,7 +312,7 @@ class SQLQueryImporterBasicCasesTest {
             query)
 
         Assertions.assertEquals("name", dataProvider.name)
-        Assertions.assertEquals(serverSQL.id, dataProvider.schemaId)
+        Assertions.assertEquals(schemaSQL.id, dataProvider.schemaId)
         Assertions.assertEquals(query, dataProvider.query)
 
         val columnByName = dataProvider.columns.map { it.name to it }.toMap()

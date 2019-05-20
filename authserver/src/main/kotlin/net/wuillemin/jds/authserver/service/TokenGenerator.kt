@@ -189,7 +189,7 @@ class TokenGenerator(
             refreshCache[id]
                 ?.let { currentEntry ->
                     refreshCache[id] = currentEntry.copy(
-                        userName = user.userName,
+                        userName = user.name,
                         roles = listOf(user.profile.toString()),
                         userPermission = permission)
                 }

@@ -24,6 +24,12 @@ import org.springframework.context.event.ApplicationEventMulticaster
 import org.springframework.context.support.AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val GROUP_ID_1 = 2L
+private const val GROUP_ID_2 = 3L
+private const val USER_ID = 10L
+
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [
     CommonConfigDataBaseTest::class,
@@ -38,11 +44,6 @@ class GroupServiceTest {
     private lateinit var groupService: GroupService
     @Autowired
     private lateinit var applicationContext: ConfigurableApplicationContext
-
-    private val GROUP_ID = 1L
-    private val GROUP_ID_1 = 2L
-    private val GROUP_ID_2 = 3L
-    private val USER_ID = 10L
 
     @Test
     fun `Get group by name should work only if a single object is present`() {

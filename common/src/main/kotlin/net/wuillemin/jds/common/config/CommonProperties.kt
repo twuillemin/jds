@@ -14,7 +14,8 @@ import java.security.PublicKey
 data class CommonProperties(
     val database: SQLDatabaseProperties,
     val server: Server,
-    val client: Client) {
+    val client: Client
+) {
 
     /**
      * Configuration of the network when acting as a server

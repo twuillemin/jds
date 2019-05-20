@@ -35,8 +35,15 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val SERVER_ID = 100L
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_ID = 300L
+private const val DATA_SOURCE_ID = 400L
 
 class CSVImporterTest {
+
     // -------------------------------------------------------------
     // Definition of the mocks
     // -------------------------------------------------------------
@@ -66,12 +73,6 @@ class CSVImporterTest {
     private val csvModelReader = CSVModelReader()
     private val csvImporter = CSVImporter(csvModelReader, modelService, dataProviderService, dataSourceService, dataAccessService)
 
-    private val GROUP_ID = 1L
-    private val SERVER_ID = 100L
-    private val SCHEMA_ID = 200L
-    private val DATA_PROVIDER_ID = 300L
-    private val DATA_SOURCE_ID = 400L
-    
     // -------------------------------------------------------------
     // Definition of objects (for mocked services)
     // -------------------------------------------------------------

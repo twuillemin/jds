@@ -33,7 +33,8 @@ import springfox.documentation.annotations.ApiIgnore
 @Secured(value = ["ROLE_USER", "ROLE_ADMIN"])
 class UserController(
     private val userService: UserService,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Return all the users of the application
@@ -43,7 +44,8 @@ class UserController(
     @ApiOperation("Get all the users of the application")
     @GetMapping
     fun getUsers(
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<User>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<User>> {
 
         logger.debug("getUsers: ${authentication.getLoggingId()}")
 
@@ -68,7 +70,8 @@ class UserController(
     @GetMapping("{id}")
     fun getUserById(
         @PathVariable("id") userId: Long,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<User> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<User> {
 
         logger.debug("getById: ${authentication.getLoggingId()}")
 
@@ -96,7 +99,8 @@ class UserController(
     fun updateUser(
         @PathVariable("id") userId: Long,
         @RequestBody user: User,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<User> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<User> {
 
         logger.debug("updateUser: ${authentication.getLoggingId()}")
 
@@ -131,7 +135,8 @@ class UserController(
     @DeleteMapping("{id}")
     fun deleteUser(
         @PathVariable("id") userId: Long,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Void> {
 
         logger.debug("deleteUser: ${authentication.getLoggingId()}")
 

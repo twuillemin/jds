@@ -25,9 +25,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+// Definition of constants
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_LOOKUP_ID = 300L
+private const val DATA_PROVIDER_TEST_ID = 301L
+private const val DATA_SOURCE_LOOKUP_ID = 400L
+private const val DATA_SOURCE_TEST_ID = 401L
+
 @ExtendWith(SpringExtension::class)
 class DataAccessServiceLookupTest {
-
 
     private var schemaService = Mockito.mock(SchemaService::class.java)
     private var dataSourceService = Mockito.mock(DataSourceService::class.java)
@@ -35,14 +41,6 @@ class DataAccessServiceLookupTest {
     private var sqlDataReader = Mockito.mock(SQLDataReader::class.java)
     private var sqlDataWriter = Mockito.mock(SQLDataWriter::class.java)
     private var sqlConnectionCache = Mockito.mock(SQLConnectionCache::class.java)
-
-
-    private val SCHEMA_ID = 200L
-    private val DATA_PROVIDER_LOOKUP_ID = 300L
-    private val DATA_PROVIDER_TEST_ID = 301L
-    private val DATA_SOURCE_LOOKUP_ID = 400L
-    private val DATA_SOURCE_TEST_ID = 401L
-
 
     private val dataProviderLookup = DataProviderSQL(
         id = DATA_PROVIDER_LOOKUP_ID,

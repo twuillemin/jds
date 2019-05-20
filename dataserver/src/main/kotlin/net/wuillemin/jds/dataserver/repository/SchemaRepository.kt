@@ -19,6 +19,10 @@ import java.sql.SQLException
 import java.sql.Statement
 import java.util.*
 
+// Definition of constants
+private const val TYPE_SQL = "sql"
+private const val TYPE_GSHEET = "gsheet"
+
 /**
  * The repository for [Schema] objects
  */
@@ -31,10 +35,6 @@ class SchemaRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
     private val schemaRowMapper = SchemaRowMapper()
 
     private val namedTemplate = NamedParameterJdbcTemplate(jdbcTemplate.dataSource!!)
-
-    private val TYPE_SQL = "sql"
-    private val TYPE_GSHEET = "gsheet"
-
 
     /**
      * Returns the number of schemas available.

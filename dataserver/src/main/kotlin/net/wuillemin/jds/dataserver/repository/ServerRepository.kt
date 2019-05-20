@@ -18,6 +18,10 @@ import java.sql.SQLException
 import java.sql.Statement
 import java.util.*
 
+// Definition of constants
+private const val TYPE_SQL = "sql"
+private const val TYPE_GSHEET = "gsheet"
+
 /**
  * The repository for [Server] objects
  */
@@ -30,10 +34,6 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
     private val serverRowMapper = ServerRowMapper()
 
     private val namedTemplate = NamedParameterJdbcTemplate(jdbcTemplate.dataSource!!)
-
-    private val TYPE_SQL = "sql"
-    private val TYPE_GSHEET = "gsheet"
-
 
     /**
      * Returns the number of servers available.

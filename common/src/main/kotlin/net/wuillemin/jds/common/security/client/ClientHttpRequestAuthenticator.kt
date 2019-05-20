@@ -17,5 +17,6 @@ interface ClientHttpRequestAuthenticator {
     fun addAuthentication(
         request: HttpRequest,
         body: ByteArray,
-        execution: ClientHttpRequestExecution)
+        execution: ClientHttpRequestExecution
+    )
 }

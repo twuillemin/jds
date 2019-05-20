@@ -19,7 +19,8 @@ import org.springframework.security.config.http.SessionCreationPolicy
 class WebSecurity00Config(
     private val logger: Logger,
     private val localisationService: LocalisationService,
-    private val commonProperties: CommonProperties) : WebSecurityConfigurerAdapter() {
+    private val commonProperties: CommonProperties
+) : WebSecurityConfigurerAdapter() {
 
     /**
      * Make a configure not pointing at nothing existing so that

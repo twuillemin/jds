@@ -43,7 +43,8 @@ class SQLDataReader(
     private val sqlPredicateConverter: SQLPredicateConverter,
     private val sqlOrderConverter: SQLOrderConverter,
     private val objectMapper: ObjectMapper,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     companion object {
 
@@ -70,7 +71,8 @@ class SQLDataReader(
         filter: Predicate? = null,
         orders: List<Order>? = null,
         indexFirstRecord: Int? = null,
-        numberOfRecords: Int? = null): List<Map<String, Any>> {
+        numberOfRecords: Int? = null
+    ): List<Map<String, Any>> {
 
         logger.debug("getData(${dataProvider.getLoggingId()})")
 

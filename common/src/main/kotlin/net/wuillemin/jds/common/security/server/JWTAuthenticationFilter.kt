@@ -54,7 +54,8 @@ import javax.servlet.http.HttpServletResponse
 open class JWTAuthenticationFilter(
     private val publicKey: PublicKey?,
     private val localisationService: LocalisationService,
-    private val authenticationEntryPoint: AuthenticationEntryPoint? = null) : OncePerRequestFilter() {
+    private val authenticationEntryPoint: AuthenticationEntryPoint? = null
+) : OncePerRequestFilter() {
 
     private val isIgnoreFailure = authenticationEntryPoint == null
 
@@ -98,7 +99,8 @@ open class JWTAuthenticationFilter(
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        chain: FilterChain) {
+        chain: FilterChain
+    ) {
 
         val debug = this.logger.isDebugEnabled
 
@@ -162,7 +164,8 @@ open class JWTAuthenticationFilter(
     private fun extractAndDecodeHeader(
         request: HttpServletRequest,
         header: String,
-        publicKey: PublicKey): AuthenticationToken {
+        publicKey: PublicKey
+    ): AuthenticationToken {
 
         val baseToken = header.substring(7)
 
@@ -274,7 +277,8 @@ open class JWTAuthenticationFilter(
     protected fun onSuccessfulAuthentication(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        authResult: Authentication) {
+        authResult: Authentication
+    ) {
     }
 
     /**
@@ -289,7 +293,8 @@ open class JWTAuthenticationFilter(
     protected fun onUnsuccessfulAuthentication(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        failed: AuthenticationException) {
+        failed: AuthenticationException
+    ) {
     }
 
     /**

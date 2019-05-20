@@ -25,7 +25,8 @@ import org.springframework.stereotype.Service
 @Service
 class SQLQueryImporter(
     private val sqlHelper: SQLHelper,
-    private val sqlModelReader: SQLModelReader) {
+    private val sqlModelReader: SQLModelReader
+) {
 
     /**
      * Build a [DataProvider] from query but does not persist it
@@ -38,7 +39,8 @@ class SQLQueryImporter(
     fun buildDataProviderFromQuery(
         schema: SchemaSQL,
         name: String,
-        query: String): DataProviderSQL {
+        query: String
+    ): DataProviderSQL {
 
         return schema.id
 
@@ -85,7 +87,8 @@ class SQLQueryImporter(
         schema: SchemaSQL,
         query: String,
         sqlTableByAlias: Map<String, String>,
-        dbTables: Map<String, List<TableColumnMeta>>): List<ColumnAttribute> {
+        dbTables: Map<String, List<TableColumnMeta>>
+    ): List<ColumnAttribute> {
 
         // Get the columns of the query from a 1 line preview
         val queryColumns = sqlModelReader.getPreviewFromQuery(schema, query, 1).columns
@@ -133,7 +136,8 @@ class SQLQueryImporter(
      */
     private fun findGivenSQLColumnNameFromQueryResult(
         sqlColumnByAlias: Map<String, SQLColumnDetail>,
-        queryColumnToSearch: TableColumnMeta): Pair<String, SQLColumnDetail>? {
+        queryColumnToSearch: TableColumnMeta
+    ): Pair<String, SQLColumnDetail>? {
 
         // Normally, the query should return a column having the same name as the sql. For example, if the sql is
         // SELECT UPPER(t.id) FROM myTable t, the query column would probably be UPPER(t.id) (case insensitive). Same
@@ -165,15 +169,15 @@ class SQLQueryImporter(
         sqlColumnByAlias: Map<String, SQLColumnDetail>,
         sqlTableByAlias: Map<String, String>,
         dbTables: Map<String, List<TableColumnMeta>>,
-        queryColumnToSearch: TableColumnMeta): StorageDetail {
+        queryColumnToSearch: TableColumnMeta
+    ): StorageDetail {
 
         val writableContainer = findGivenSQLColumnNameFromQueryResult(sqlColumnByAlias, queryColumnToSearch)
             ?.let { sqlColumn ->
 
                 val aliasName = sqlColumn.first
-                val sqlDetail = sqlColumn.second
 
-                when (sqlDetail) {
+                when (val sqlDetail = sqlColumn.second) {
 
                     //
                     // The column is an writable column
@@ -293,7 +297,8 @@ class SQLQueryImporter(
      */
     private fun getEditable(
         columns: List<ColumnAttribute>,
-        dbTables: Map<String, List<TableColumnMeta>>): Boolean {
+        dbTables: Map<String, List<TableColumnMeta>>
+    ): Boolean {
 
         // Group the insertion target, so that each target is defined by its db table name and the list of the columns
         // coming from the query

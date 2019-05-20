@@ -28,6 +28,12 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val SERVER_ID = 100L
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_ID = 300L
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SQLModelReaderTest {
 
@@ -43,11 +49,6 @@ class SQLModelReaderTest {
     private val sqlDataWriter = SQLDataWriter(schemaService, sqlPredicateConverter, sqlConnectionCache, objectMapper, logger)
     private val sqlModelReader = SQLModelReader(jdbcHelper, sqlConnectionCache, schemaService)
 
-    private val GROUP_ID = 1L
-    private val SERVER_ID = 100L
-    private val SCHEMA_ID = 200L
-    private val DATA_PROVIDER_ID = 300L
-    
     private val serverSQL = ServerSQL(
         SERVER_ID,
         "testServer",

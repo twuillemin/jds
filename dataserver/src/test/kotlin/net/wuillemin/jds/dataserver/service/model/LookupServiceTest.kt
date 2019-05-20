@@ -34,6 +34,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.util.*
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val SERVER_ID = 100L
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_TEST_ID = 300L
+private const val DATA_PROVIDER_LOOKUP_ID = 301L
+private const val DATA_SOURCE_LOOKUP_ID = 400L
+
 @ExtendWith(SpringExtension::class)
 class LookupServiceTest {
 
@@ -62,13 +70,6 @@ class LookupServiceTest {
     private val dataAccessService = DataAccessService(dataSourceService, dataProviderService, schemaService, sqlDataReader, sqlDataWriter, sqlConnectionCache)
     private val lookupService: LookupService = LookupService(dataSourceService, dataProviderService, dataAccessService, localisationService, objectMapper)
 
-    private val GROUP_ID = 1L
-    private val SERVER_ID = 100L
-    private val SCHEMA_ID = 200L
-    private val DATA_PROVIDER_TEST_ID = 300L
-    private val DATA_PROVIDER_LOOKUP_ID = 300L
-    private val DATA_SOURCE_LOOKUP_ID = 400L
-    
     // -------------------------------------------------------------
     // Definition of objects (for mocked services)
     // -------------------------------------------------------------
@@ -151,7 +152,7 @@ class LookupServiceTest {
     }
 
     @Test
-    fun `Can promote a column to lookupnad use it`() {
+    fun `Can promote a column to lookup and use it`() {
 
         sqlConnectionCache.getConnection(schemaSQL).use { connection ->
 

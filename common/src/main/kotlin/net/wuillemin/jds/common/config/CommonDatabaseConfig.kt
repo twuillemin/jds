@@ -7,15 +7,28 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcTemplate
 import javax.sql.DataSource
 
+/**
+ * The configuration for the database of the common services
+ */
 @Configuration
 @ComponentScan(basePackages = ["net.wuillemin.jds.common.repository"])
-class CommonDatabaseConfig(private val commonProperties: CommonProperties){
+class CommonDatabaseConfig(private val commonProperties: CommonProperties) {
 
+    /**
+     * Create the JDBC template for common repositories
+     *
+     * @return the JDBC template for common repositories
+     */
     @Bean(name = ["commonJdbcTemplate"])
-    internal fun commonJdbcTemplate(): JdbcTemplate {
+    fun commonJdbcTemplate(): JdbcTemplate {
         return JdbcTemplate(commonDataSource())
     }
 
+    /**
+     * Create the JDBC [DataSource] for common repositories
+     *
+     * @return the JDBC DataSource for common repositories
+     */
     @Bean(name = ["commonDatabaseJDBC"])
     fun commonDataSource(): DataSource {
         return DataSourceBuilder
@@ -24,7 +37,7 @@ class CommonDatabaseConfig(private val commonProperties: CommonProperties){
             .username(commonProperties.database.user)
             .password(commonProperties.database.password)
             .driverClassName(commonProperties.database.driverClassName)
-            .build();
+            .build()
     }
 }
 

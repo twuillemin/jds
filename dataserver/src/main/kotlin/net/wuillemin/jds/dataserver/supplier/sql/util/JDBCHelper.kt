@@ -85,7 +85,8 @@ class JDBCHelper {
     @Throws(SQLException::class)
     fun convertResultSet(
         resultSet: ResultSet,
-        defaultTimeZone: ZoneId): Map<String, Any> {
+        defaultTimeZone: ZoneId
+    ): Map<String, Any> {
 
         // JDBC columns start at 1 and range are inclusive
         return IntRange(1, resultSet.metaData.columnCount)
@@ -111,7 +112,8 @@ class JDBCHelper {
     private fun convertColumn(
         resultSet: ResultSet,
         columnIndex: Int,
-        defaultTimeZone: ZoneId): Any? {
+        defaultTimeZone: ZoneId
+    ): Any? {
 
         // ------------------------------------------------------------
         //

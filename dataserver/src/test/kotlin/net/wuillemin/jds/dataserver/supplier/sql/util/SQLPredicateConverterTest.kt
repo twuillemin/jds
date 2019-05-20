@@ -39,7 +39,7 @@ class SQLPredicateConverterTest {
     private val predicateContextBuilder = PredicateContextBuilder()
     private val sqlPredicateConverter = SQLPredicateConverter(predicateContextBuilder)
 
-    @AfterAll()
+    @AfterAll
     fun afterAll() {
         connection.close()
     }

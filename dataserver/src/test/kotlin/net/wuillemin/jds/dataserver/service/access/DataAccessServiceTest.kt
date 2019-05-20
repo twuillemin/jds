@@ -21,6 +21,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+// Definition of constants
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_SQL_ID = 300L
+private const val DATA_SOURCE_ID = 400L
+
 @ExtendWith(SpringExtension::class)
 class DataAccessServiceTest {
 
@@ -31,11 +36,6 @@ class DataAccessServiceTest {
     private var sqlDataWriter = Mockito.mock(SQLDataWriter::class.java)
     private var sqlConnectionCache = Mockito.mock(SQLConnectionCache::class.java)
 
-    private val SCHEMA_ID = 200L
-    private val DATA_PROVIDER_SQL_ID = 300L
-    private val DATA_SOURCE_ID = 400L
-    
-    
     @BeforeEach
     fun beforeEach() {
         dataProviderService = Mockito.mock(DataProviderService::class.java)

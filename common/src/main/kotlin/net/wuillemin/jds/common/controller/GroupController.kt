@@ -37,7 +37,8 @@ import springfox.documentation.annotations.ApiIgnore
 class GroupController(
     private val userService: UserService,
     private val groupService: GroupService,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Get all groups of the application
@@ -47,7 +48,8 @@ class GroupController(
     @ApiOperation("Get all the groups")
     @GetMapping
     fun getGroups(
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<Group>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<Group>> {
 
         logger.warn("getGroups: ${authentication.getLoggingId()}")
 
@@ -70,7 +72,8 @@ class GroupController(
     @GetMapping("{id}")
     fun getGroupById(
         @PathVariable("id") groupId: Long,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Group> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Group> {
 
         logger.warn("getGroup: ${authentication.getLoggingId()}")
 
@@ -92,7 +95,8 @@ class GroupController(
     @PostMapping
     fun createGroup(
         @RequestBody group: Group,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Group> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Group> {
 
         logger.warn("createGroup: ${authentication.getLoggingId()}")
 
@@ -113,7 +117,8 @@ class GroupController(
     fun setGroupAdministrators(
         @PathVariable("id") groupId: Long,
         @RequestBody administratorIds: List<Long>,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Group> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Group> {
 
         logger.warn("setGroupAdministrators: ${authentication.getLoggingId()}")
 
@@ -143,7 +148,8 @@ class GroupController(
     fun setGroupUsers(
         @PathVariable("id") groupId: Long,
         @RequestBody userIds: List<Long>,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Group> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Group> {
 
         logger.warn("setGroupUsers: ${authentication.getLoggingId()}")
 
@@ -172,7 +178,8 @@ class GroupController(
     fun deleteGroup(
         @PathVariable("id") id: Long,
         @RequestBody userIds: List<Long>,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Void> {
 
         logger.warn("deleteGroup: ${authentication.getLoggingId()}")
 

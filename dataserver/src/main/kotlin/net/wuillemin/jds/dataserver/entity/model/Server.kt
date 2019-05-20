@@ -72,7 +72,6 @@ data class ServerSQL(
  * @param userName The name of the user
  * @param password The password of the user
  * @param workbookURL The link to the resource
- * @param accessDetails The access information
  */
 data class ServerGSheet(
     // Inherited properties

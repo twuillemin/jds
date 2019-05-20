@@ -8,7 +8,6 @@ import net.wuillemin.jds.common.event.GroupUpdatedEvent
 import net.wuillemin.jds.common.event.UserCreatedEvent
 import net.wuillemin.jds.common.event.UserDeletedEvent
 import net.wuillemin.jds.common.event.UserUpdatedEvent
-import net.wuillemin.jds.common.exception.BadParameterException
 import net.wuillemin.jds.common.exception.ConstraintException
 import net.wuillemin.jds.common.exception.CriticalConstraintException
 import net.wuillemin.jds.common.exception.NotFoundException
@@ -87,7 +86,7 @@ class UserServiceTest {
 
         val userSaved = userRepository.findById(createdUser.id!!).get()
         Assertions.assertNotNull(userSaved)
-        Assertions.assertEquals("userName", userSaved.userName)
+        Assertions.assertEquals("userName", userSaved.name)
         Assertions.assertEquals("firstName", userSaved.firstName)
         Assertions.assertEquals("lastName", userSaved.lastName)
         Assertions.assertNotEquals("password", userSaved.password)
@@ -155,7 +154,7 @@ class UserServiceTest {
 
         val userSaved = userRepository.findById(updatedUser.id!!).get()
         Assertions.assertNotNull(userSaved)
-        Assertions.assertEquals("userName", userSaved.userName)
+        Assertions.assertEquals("userName", userSaved.name)
         Assertions.assertEquals("firstName", userSaved.firstName)
         Assertions.assertEquals("lastName", userSaved.lastName)
         Assertions.assertNotEquals("password", userSaved.password)
@@ -193,7 +192,7 @@ class UserServiceTest {
 
         val userSaved = userRepository.findById(updatedUser.id!!).get()
         Assertions.assertNotNull(userSaved)
-        Assertions.assertEquals("userName", userSaved.userName)
+        Assertions.assertEquals("userName", userSaved.name)
         Assertions.assertEquals("firstName", userSaved.firstName)
         Assertions.assertEquals("lastName", userSaved.lastName)
         Assertions.assertNotEquals("password", userSaved.password)
@@ -224,7 +223,7 @@ class UserServiceTest {
         applicationEventMulticaster.addApplicationListener(listener)
 
         // Update user
-        Assertions.assertThrows(ConstraintException::class.java) { userService.updateSafeUser(user.copy(userName = "existing")) }
+        Assertions.assertThrows(ConstraintException::class.java) { userService.updateSafeUser(user.copy(name = "existing")) }
 
         applicationEventMulticaster.removeApplicationListener(listener)
 

@@ -26,6 +26,14 @@ import java.sql.SQLException
 import java.sql.Statement
 import java.util.*
 
+// Definition of constants
+private const val TYPE_DATAPROVIDER_SQL = "sql"
+private const val TYPE_DATAPROVIDER_GSHEET = "gsheet"
+private const val TYPE_COLUMN_ATTRIBUTE = "attribute"
+private const val TYPE_COLUMN_LOOKUP = "lookup"
+private const val TYPE_STORAGE_READ_ONLY = "read_only"
+private const val TYPE_STORAGE_WRITABLE = "writable"
+
 /**
  * The repository for [DataProvider] objects
  */
@@ -40,15 +48,6 @@ class DataProviderRepository(@Qualifier("dataserverJdbcTemplate") private val jd
     private val columnRowMapper = ColumnRowMapper()
 
     private val namedTemplate = NamedParameterJdbcTemplate(jdbcTemplate.dataSource!!)
-
-    private val TYPE_DATAPROVIDER_SQL = "sql"
-    private val TYPE_DATAPROVIDER_GSHEET = "gsheet"
-
-    private val TYPE_COLUMN_ATTRIBUTE = "attribute"
-    private val TYPE_COLUMN_LOOKUP = "lookup"
-
-    private val TYPE_STORAGE_READ_ONLY = "read_only"
-    private val TYPE_STORAGE_WRITABLE = "writable"
 
     /**
      * Returns the number of dataProviders available.
@@ -234,7 +233,6 @@ class DataProviderRepository(@Qualifier("dataserverJdbcTemplate") private val jd
         val dataProviderId = dataProvider.id
             ?.let { dataProviderId ->
                 if (existsById(dataProviderId)) {
-                    "id, type, name, schema_id, editable, sql_query, gsheet_sheet_name"
                     val args = when (dataProvider) {
                         is DataProviderSQL    -> arrayOf(
                             TYPE_DATAPROVIDER_SQL,
@@ -285,7 +283,7 @@ class DataProviderRepository(@Qualifier("dataserverJdbcTemplate") private val jd
 
         // Insert the admin and the users
         this.jdbcTemplate.batchUpdate(
-            "INSERT INTO jds_group_user(data_provider_id, column_index, type, name, data_type, size, lookup_maximum_number, lookup_data_source_id, lookup_key_column, lookup_value_column, storage_type, storage_nullable, storage_primary_key, storage_auto_increment, storage_read_attr_name, storage_write_attr_name, storage_container_name) VALUES(?, ?, ?)",
+            "INSERT INTO jds_group_user(data_provider_id, column_index, type, name, data_type, size, lookup_maximum_number, lookup_data_source_id, lookup_key_column, lookup_value_column, storage_type, storage_nullable, storage_primary_key, storage_auto_increment, storage_read_attr_name, storage_write_attr_name, storage_container_name) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             object : BatchPreparedStatementSetter {
 
                 @Throws(SQLException::class)

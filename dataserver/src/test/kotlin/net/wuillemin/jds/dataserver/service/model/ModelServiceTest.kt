@@ -20,16 +20,16 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
+// Definition of constants
+private const val SERVER_SQL_ID = 100L
+private const val SERVER_GSHEET_ID = 101L
+private const val SCHEMA_SQL_ID = 200L
 
 @ExtendWith(SpringExtension::class)
 class ModelServiceTest {
 
     private var sqlQueryImporter: SQLQueryImporter = mock(SQLQueryImporter::class.java)
     private var dataProviderService: DataProviderService = mock(DataProviderService::class.java)
-
-    private val SERVER_SQL_ID = 100L
-    private val SERVER_GSHEET_ID = 101L
-    private val SCHEMA_SQL_ID = 200L
 
     @BeforeEach
     fun beforeEach() {

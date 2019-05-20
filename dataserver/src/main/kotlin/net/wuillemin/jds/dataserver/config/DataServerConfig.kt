@@ -17,7 +17,8 @@ import org.springframework.context.support.ResourceBundleMessageSource
     "net.wuillemin.jds.dataserver.supplier"])
 @EnableConfigurationProperties(DataServerSpringProperties::class)
 class DataServerConfig(
-    resourceBundleMessageSource: ResourceBundleMessageSource) {
+    resourceBundleMessageSource: ResourceBundleMessageSource
+) {
 
     init {
         resourceBundleMessageSource.addBasenames("messages/dataserver_messages")

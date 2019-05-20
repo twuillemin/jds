@@ -121,6 +121,7 @@ object E {
                 val columnDoesNotExist = ExceptionCode("dataserver.service.model.lookup.promote_column_not_exist")
                 val columnIsNotString = ExceptionCode("dataserver.service.model.lookup.promote_column_is_not_string")
                 val dataProviderWithoutPrimaryKey = ExceptionCode("dataserver.service.model.lookup.promote_dataprovider_without_primary_key")
+                val primaryKeyValueIsNull = ExceptionCode("dataserver.service.model.lookup.promote_dataprovider_primary_key_value_null")
                 val tooManyValues = ExceptionCode("dataserver.service.model.lookup.promote_too_many_values")
                 val unknownLookupValue = ExceptionCode("dataserver.service.model.lookup.promote_unknown_lookup_value")
                 val tooLargeLookup = ExceptionCode("dataserver.service.model.lookup.promote_too_large_lookup")

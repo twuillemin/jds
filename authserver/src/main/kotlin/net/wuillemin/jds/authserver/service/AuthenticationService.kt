@@ -29,7 +29,8 @@ class AuthenticationService(
     private val tokenGenerator: TokenGenerator,
     private val authServerProperties: AuthServerProperties,
     private val bCryptPasswordEncoder: BCryptPasswordEncoder,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Process a loginByTokenRequest request. If the authentication can not be processed, an Exception
@@ -75,7 +76,7 @@ class AuthenticationService(
                 val userPermission = permissionBuilder.buildPermission(user)
 
                 tokenGenerator.buildToken(
-                    user.userName,
+                    user.name,
                     listOf(user.profile.springRoleName),
                     userPermission)
             }
@@ -98,7 +99,7 @@ class AuthenticationService(
         val userPermission = permissionBuilder.buildPermission(user)
 
         return tokenGenerator.buildToken(
-            user.userName,
+            user.name,
             listOf(user.profile.springRoleName),
             userPermission)
     }

@@ -67,7 +67,7 @@ class UserRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate: 
     /**
      * Search a user by its name.
      *
-     * @param name The userName to search
+     * @param name The name to search
      * @return a list of user object, that should contain 1 object is the user is found
      */
     fun findAllByName(name: String): List<User> {
@@ -136,7 +136,8 @@ class UserRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate: 
      * Deletes all entities managed by the repository.
      */
     override fun deleteAll() {
-        jdbcTemplate.execute("TRUNCATE TABLE jds_user")
+        jdbcTemplate.execute("TRUNCATE TABLE jds_group_user")
+        jdbcTemplate.execute("DELETE FROM jds_user")
     }
 
     /**
@@ -145,6 +146,10 @@ class UserRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate: 
      * @param users The users to delete
      */
     override fun deleteAll(users: Iterable<User>) {
+        namedTemplate.update(
+            "DELETE FROM jds_group_user WHERE user_id IN (:ids)",
+            MapSqlParameterSource("ids", users.mapNotNull { it.id }))
+
         namedTemplate.update(
             "DELETE FROM jds_user WHERE id IN (:ids)",
             MapSqlParameterSource("ids", users.mapNotNull { it.id }))
@@ -158,9 +163,16 @@ class UserRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate: 
     override fun delete(user: User) {
         user.id
             ?.let { userId ->
+
+                jdbcTemplate.update(
+                    "DELETE FROM jds_group_user WHERE user_id = ?",
+                    arrayOf<Any>(userId),
+                    arrayOf(java.sql.Types.BIGINT).toIntArray())
+
                 jdbcTemplate.update(
                     "DELETE FROM jds_user WHERE id = ?",
-                    arrayOf<Any>(userId))
+                    arrayOf<Any>(userId),
+                    arrayOf(java.sql.Types.BIGINT).toIntArray())
             }
             ?: throw IllegalArgumentException("Unable to delete a non persisted User object")
     }
@@ -172,8 +184,14 @@ class UserRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate: 
      */
     override fun deleteById(id: Long) {
         jdbcTemplate.update(
+            "DELETE FROM jds_group_user WHERE user_id = ?",
+            arrayOf<Any>(id),
+            arrayOf(java.sql.Types.BIGINT).toIntArray())
+
+        jdbcTemplate.update(
             "DELETE FROM jds_user WHERE id = ?",
-            arrayOf<Any>(id))
+            arrayOf<Any>(id),
+            arrayOf(java.sql.Types.BIGINT).toIntArray())
     }
 
     /**
@@ -190,8 +208,8 @@ class UserRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate: 
                 if (existsById(userId)) {
                     jdbcTemplate.update(
                         "UPDATE jds_user SET name = ?, password = ?, first_name = ?, last_name = ?, enabled = ?, profile = ? WHERE id = ?",
-                        arrayOf(user.userName, user.password, user.firstName, user.lastName, user.enabled, user.profile.toString(), userId),
-                        arrayOf(java.sql.Types.VARCHAR,java.sql.Types.VARCHAR,java.sql.Types.VARCHAR,java.sql.Types.VARCHAR,java.sql.Types.BOOLEAN, java.sql.Types.VARCHAR, java.sql.Types.BIGINT).toIntArray())
+                        arrayOf(user.name, user.password, user.firstName, user.lastName, user.enabled, user.profile.toString(), userId),
+                        arrayOf(java.sql.Types.VARCHAR, java.sql.Types.VARCHAR, java.sql.Types.VARCHAR, java.sql.Types.VARCHAR, java.sql.Types.BOOLEAN, java.sql.Types.VARCHAR, java.sql.Types.BIGINT).toIntArray())
                     userId
                 }
                 else {
@@ -217,7 +235,7 @@ class UserRepository(@Qualifier("commonJdbcTemplate") private val jdbcTemplate: 
 
         return { connection ->
             val ps = connection.prepareStatement("INSERT INTO jds_user(name, password, first_name, last_name, enabled, profile) VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)
-            ps.setString(1, user.userName)
+            ps.setString(1, user.name)
             ps.setString(2, user.password)
             ps.setString(3, user.firstName)
             ps.setString(4, user.lastName)

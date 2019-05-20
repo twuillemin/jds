@@ -27,6 +27,11 @@ import org.mockito.Mockito
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val SERVER_ID = 100L
+private const val SCHEMA_ID = 200L
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SQLQueryImporterComplexCasesTest {
 
@@ -45,10 +50,6 @@ class SQLQueryImporterComplexCasesTest {
     private val sqlDataReader = SQLDataReader(schemaService, jdbcHelper, sqlHelper, sqlConnectionCache, sqlPredicateConverter, sqlOrderConverter, objectMapper, logger)
     private val sqlModelReader = SQLModelReader(jdbcHelper, sqlConnectionCache, schemaService)
     private val sqlQueryImporter = SQLQueryImporter(sqlHelper, sqlModelReader)
-
-    private val GROUP_ID = 1L
-    private val SERVER_ID = 100L
-    private val SCHEMA_ID = 200L
 
     private val serverSQL = ServerSQL(
         SERVER_ID,

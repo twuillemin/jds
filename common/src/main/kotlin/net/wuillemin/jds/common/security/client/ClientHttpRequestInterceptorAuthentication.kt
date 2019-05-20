@@ -26,7 +26,8 @@ class ClientHttpRequestInterceptorAuthentication(
     private val networkAuthenticatorJwt: ClientHttpRequestAuthenticatorJwt,
     private val networkAuthenticatorBasic: ClientHttpRequestAuthenticatorBasic,
     private val networkAuthenticatorNoAuth: ClientHttpRequestAuthenticatorNoAuth,
-    private val logger: Logger) : ClientHttpRequestInterceptor {
+    private val logger: Logger
+) : ClientHttpRequestInterceptor {
 
     private val authenticationByServer = buildAuthenticatorMap()
 
@@ -43,7 +44,8 @@ class ClientHttpRequestInterceptorAuthentication(
     override fun intercept(
         request: HttpRequest,
         body: ByteArray,
-        execution: ClientHttpRequestExecution): ClientHttpResponse {
+        execution: ClientHttpRequestExecution
+    ): ClientHttpResponse {
 
         // Check if there is not already an authentication
         if (request.headers[HTTP_HEADER_AUTHORIZATION] == null) {

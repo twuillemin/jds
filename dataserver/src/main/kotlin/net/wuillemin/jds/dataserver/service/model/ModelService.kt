@@ -112,7 +112,7 @@ class ModelService(
         val dataProvider = sqlQueryImporter.buildDataProviderFromQuery(
             schemaSQL,
             name,
-            query        )
+            query)
 
         // Create a new DataProvider
         return dataProviderService.addDataProvider(dataProvider)

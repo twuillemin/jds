@@ -115,9 +115,15 @@ class LookupService(
                             .filter { it.isNotBlank() }
                             .toList()
 
-                        // Get the primary keys
+                        // Get the values primary keys. As these are the values of the primary
+                        // they will always be present, but the as data are received as a map,
+                        // they could be null, so use getOrElse with an empty string
                         val lineId = primaryKeys
-                            .map { primaryKeys[0] to line[primaryKeys[0]]!! }
+                            .map { primaryKey ->
+                                val value = line[primaryKey]
+                                    ?: throw ConstraintException(E.service.model.lookup.primaryKeyValueIsNull, dataProvider, primaryKey)
+                                primaryKey to value
+                            }
                             .toList()
 
                         // Convert to new values
@@ -162,7 +168,7 @@ class LookupService(
                             errors.add(localisationService.getMessage(
                                 E.service.model.lookup.tooLargeLookup,
                                 arrayOf(lineId, newStringValue?.length ?: 0, columnToUpdate.size),
-                                locale                            )                            )
+                                locale))
                         }
 
                         // Make a map holding the value to set
@@ -202,7 +208,7 @@ class LookupService(
                     query.maximumNumberOfLookups,
                     query.dataSourceId,
                     query.keyColumnName,
-                    query.valueColumnName                )
+                    query.valueColumnName)
             }
         }
 
@@ -211,6 +217,6 @@ class LookupService(
             when (dataProvider) {
                 is DataProviderSQL    -> dataProvider.copy(columns = newColumns)
                 is DataProviderGSheet -> dataProvider.copy(columns = newColumns)
-            }        )
+            })
     }
 }

@@ -118,7 +118,7 @@ class DataSourceController(
      * @param authentication The authentication of the requester
      */
     @ApiOperation("Create a new DataSource.")
-    @PostMapping()
+    @PostMapping
     fun createDataSource(
         @RequestBody dataSource: DataSource,
         @ApiIgnore authentication: AuthenticationToken
