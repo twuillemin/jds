@@ -151,19 +151,21 @@ jds:
   dataserver:
     # ----------------------------------------------------------------
     # The database storing the information about the data models
-    # The database is supposed to be a Mongo Database
+    # The database is supposed to be a SQL database
     # ----------------------------------------------------------------
     configurationDatabase:
-      host: localhost
-      port: 27017
-      database: dataserver
+      url: jdbc:postgresql://localhost/jds_configuration
+      user: jds
+      password: "jds_password"
+      driverClassName: "org.postgresql.Driver"
 
     # ----------------------------------------------------------------
     # The list of databases for storing user data. At least one must
-    # be present
+    # be present in the list
     # The database is supposed to be a PostgresDatabase
     # ----------------------------------------------------------------
     storageDatabases:
       - url: jdbc:postgresql://localhost/jds_data
         user: jds
         password: "jds_password"
+        driverClassName: "org.postgresql.Driver"

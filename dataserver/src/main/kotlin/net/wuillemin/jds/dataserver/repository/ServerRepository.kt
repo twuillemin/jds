@@ -1,6 +1,8 @@
 package net.wuillemin.jds.dataserver.repository
 
 import net.wuillemin.jds.dataserver.entity.model.Server
+import net.wuillemin.jds.dataserver.entity.model.ServerGSheet
+import net.wuillemin.jds.dataserver.entity.model.ServerSQL
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.repository.CrudRepository
 import org.springframework.jdbc.core.JdbcTemplate
@@ -23,11 +25,14 @@ import java.util.*
 @Repository
 class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate) : CrudRepository<Server, Long> {
 
-    private val rowMapperColumns = "id, name, password, first_name, last_name, enabled, profile"
+    private val serverSelectColumns = "id, type, name, group_id, customer_defined, sql_jdbc_url, sql_user_name, sql_password, sql_driver_class_name, gsheet_workbook_url, gsheet_user_name, gsheet_password"
 
-    private val rowMapper = ServerRowMapper()
+    private val serverRowMapper = ServerRowMapper()
 
     private val namedTemplate = NamedParameterJdbcTemplate(jdbcTemplate.dataSource!!)
+
+    private val TYPE_SQL = "sql"
+    private val TYPE_GSHEET = "gsheet"
 
 
     /**
@@ -45,7 +50,7 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      * @return all servers
      */
     override fun findAll(): Iterable<Server> {
-        return jdbcTemplate.query("SELECT $rowMapperColumns FROM jds_server", rowMapper)
+        return jdbcTemplate.query("SELECT $serverSelectColumns FROM jds_server", serverRowMapper)
     }
 
     /**
@@ -56,9 +61,9 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      */
     override fun findAllById(ids: Iterable<Long>): Iterable<Server> {
         return namedTemplate.query(
-            "SELECT $rowMapperColumns FROM jds_server WHERE id IN (:ids)",
+            "SELECT $serverSelectColumns FROM jds_server WHERE id IN (:ids)",
             MapSqlParameterSource("ids", ids),
-            rowMapper)
+            serverRowMapper)
     }
 
     /**
@@ -66,11 +71,11 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      * @param groupIds The id of the groups
      * @return a list of servers
      */
-    fun findByGroupIdIn(name: String): List<Server> {
-        return jdbcTemplate.query(
-            "SELECT $rowMapperColumns FROM jds_server WHERE name = ?",
-            arrayOf<Any>(name),
-            rowMapper)
+    fun findByGroupIdIn(groupIds: Iterable<Long>): Iterable<Server> {
+        return namedTemplate.query(
+            "SELECT $serverSelectColumns FROM jds_server WHERE group_id IN (:groupIds)",
+            MapSqlParameterSource("groupIds", groupIds),
+            serverRowMapper)
     }
 
     /**
@@ -91,15 +96,15 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
     /**
      * Retrieves an server by its id.
      *
-     * @param id must not be {@literal null}.
+     * @param id The id of the server to retrieve.
      * @return the server with the given id or {@literal Optional#empty()} if none found
      */
     override fun findById(id: Long): Optional<Server> {
         return Optional.ofNullable(
             jdbcTemplate.queryForObject(
-                "SELECT $rowMapperColumns FROM jds_server WHERE id = ?",
+                "SELECT $serverSelectColumns FROM jds_server WHERE id = ?",
                 arrayOf<Any>(id),
-                rowMapper))
+                serverRowMapper))
     }
 
     /**
@@ -184,10 +189,52 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
         return server.id
             ?.let { serverId ->
                 if (existsById(serverId)) {
+
+                    val args = when (server) {
+                        is ServerSQL    -> arrayOf(
+                            TYPE_SQL,
+                            server.name,
+                            server.groupId,
+                            server.customerDefined,
+                            server.jdbcURL,
+                            server.userName,
+                            server.password,
+                            server.driverClassName,
+                            null,
+                            null,
+                            null,
+                            server.id)
+                        is ServerGSheet -> arrayOf(
+                            TYPE_GSHEET,
+                            server.name,
+                            server.groupId,
+                            server.customerDefined,
+                            null,
+                            null,
+                            null,
+                            null,
+                            server.workbookURL,
+                            server.userName,
+                            server.password,
+                            server.id)
+                    }
+
                     jdbcTemplate.update(
-                        "UPDATE jds_server SET name = ?, password = ?, first_name = ?, last_name = ?, enabled = ?, profile = ? WHERE id = ?",
-                        arrayOf(server.serverName, server.password, server.firstName, server.lastName, server.enabled, server.profile.toString(), serverId),
-                        arrayOf(java.sql.Types.VARCHAR,java.sql.Types.VARCHAR,java.sql.Types.VARCHAR,java.sql.Types.VARCHAR,java.sql.Types.BOOLEAN, java.sql.Types.VARCHAR, java.sql.Types.BIGINT).toIntArray())
+                        "UPDATE jds_server SET type = ?, name = ?, group_id = ?, customer_defined = ?, sql_jdbc_url = ?, sql_user_name = ?, sql_password = ?, sql_driver_class_name = ?, gsheet_workbook_url = ?, gsheet_user_name = ?, gsheet_password = ? WHERE id = ?",
+                        args,
+                        arrayOf(
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.BIGINT,
+                            java.sql.Types.BOOLEAN,
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.VARCHAR,
+                            java.sql.Types.BIGINT).toIntArray())
                     serverId
                 }
                 else {
@@ -212,13 +259,36 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
     private fun mapInsert(server: Server): ((Connection) -> PreparedStatement) {
 
         return { connection ->
-            val ps = connection.prepareStatement("INSERT INTO jds_server(name, password, first_name, last_name, enabled, profile) VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)
-            ps.setString(1, server.serverName)
-            ps.setString(2, server.password)
-            ps.setString(3, server.firstName)
-            ps.setString(4, server.lastName)
-            ps.setBoolean(5, server.enabled)
-            ps.setString(6, server.profile.toString())
+            val ps = connection.prepareStatement("INSERT INTO jds_server(type, name, group_id, customer_defined, sql_jdbc_url, sql_user_name, sql_password, sql_driver_class_name, gsheet_workbook_url, gsheet_user_name, gsheet_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)
+
+            when (server) {
+                is ServerSQL    -> {
+                    ps.setString(1, TYPE_SQL)
+                    ps.setString(2, server.name)
+                    ps.setLong(3, server.groupId)
+                    ps.setBoolean(4, server.customerDefined)
+                    ps.setString(5, server.jdbcURL)
+                    ps.setString(6, server.userName)
+                    ps.setString(7, server.password)
+                    ps.setString(8, server.driverClassName)
+                    ps.setNull(9, java.sql.Types.VARCHAR)
+                    ps.setNull(10, java.sql.Types.VARCHAR)
+                    ps.setNull(11, java.sql.Types.VARCHAR)
+                }
+                is ServerGSheet -> {
+                    ps.setString(1, TYPE_SQL)
+                    ps.setString(2, server.name)
+                    ps.setLong(3, server.groupId)
+                    ps.setBoolean(4, server.customerDefined)
+                    ps.setNull(5, java.sql.Types.VARCHAR)
+                    ps.setNull(6, java.sql.Types.VARCHAR)
+                    ps.setNull(7, java.sql.Types.VARCHAR)
+                    ps.setNull(8, java.sql.Types.VARCHAR)
+                    ps.setString(9, server.workbookURL)
+                    ps.setString(10, server.userName)
+                    ps.setString(11, server.password)
+                }
+            }
             ps
         }
     }
@@ -238,14 +308,35 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
          */
         @Throws(SQLException::class)
         override fun mapRow(rs: ResultSet, rowNum: Int): Server {
-            return Server(
-                rs.getLong(1),
-                rs.getString(2),
-                rs.getString(3),
-                rs.getString(4),
-                rs.getString(5),
-                rs.getBoolean(6),
-                Profile.valueOf(rs.getString(7)))
+
+            val id = rs.getLong(1)
+            val type = rs.getString(2)
+            val name = rs.getString(3)
+            val groupId = rs.getLong(4)
+            val customerDefined = rs.getBoolean(5)
+
+            return when (type) {
+                TYPE_SQL    -> ServerSQL(
+                    id,
+                    name,
+                    groupId,
+                    customerDefined,
+                    rs.getString(6),
+                    rs.getString(7),
+                    rs.getString(8),
+                    rs.getString(9)
+                )
+                TYPE_GSHEET -> ServerGSheet(
+                    id,
+                    name,
+                    groupId,
+                    customerDefined,
+                    rs.getString(10),
+                    rs.getString(11),
+                    rs.getString(12)
+                )
+                else        -> throw SQLException("Unknown Server type when reading from database \"$type\"")
+            }
         }
     }
 }

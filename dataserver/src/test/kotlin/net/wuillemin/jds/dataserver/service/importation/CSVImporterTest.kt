@@ -82,7 +82,8 @@ class CSVImporterTest {
         true,
         "jdbc:h2:mem:",
         "sa",
-        null)
+        null,
+        "org.h2.Driver")
 
     private val schemaSQL = SchemaSQL(
         SCHEMA_ID,

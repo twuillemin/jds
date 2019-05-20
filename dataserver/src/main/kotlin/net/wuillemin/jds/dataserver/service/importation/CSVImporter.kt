@@ -93,8 +93,8 @@ class CSVImporter(
         val dataSource = dataSourceService.addDataSource(
             DataSource(
                 null,
-                dataProvider.id!!,
                 tableName,
+                dataProvider.id!!,
                 emptySet(),
                 emptySet(),
                 emptySet()))

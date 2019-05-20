@@ -65,7 +65,8 @@ class SQLDataWriterTest {
         true,
         "jdbc:h2:mem:",
         "sa",
-        null)
+        null,
+        "org.h2.Driver")
 
     private val schemaSQL = SchemaSQL(
         SCHEMA_ID,
@@ -355,8 +356,8 @@ class SQLDataWriterTest {
     private fun getBasicDataProvider(): DataProviderSQL {
         return DataProviderSQL(
             DATA_PROVIDER_ID,
-            SCHEMA_ID,
             "data provider name",
+            SCHEMA_ID,
             listOf(
                 ColumnAttribute(
                     "id",
@@ -405,8 +406,8 @@ class SQLDataWriterTest {
     private fun getAllMandatoryDataProvider(): DataProviderSQL {
         return DataProviderSQL(
             DATA_PROVIDER_ID,
-            SCHEMA_ID,
             "data provider name",
+            SCHEMA_ID,
             listOf(
                 ColumnAttribute(
                     "id",
@@ -455,8 +456,8 @@ class SQLDataWriterTest {
     private fun getPrimaryKeyToBeProvidedDataProvider(): DataProviderSQL {
         return DataProviderSQL(
             DATA_PROVIDER_ID,
-            SCHEMA_ID,
             "data provider name",
+            SCHEMA_ID,
             listOf(
                 ColumnAttribute(
                     "id",
@@ -505,8 +506,8 @@ class SQLDataWriterTest {
     private fun getNonEditableDataProvider(): DataProviderSQL {
         return DataProviderSQL(
             DATA_PROVIDER_ID,
-            SCHEMA_ID,
             "data provider name",
+            SCHEMA_ID,
             listOf(
                 ColumnAttribute(
                     "id",

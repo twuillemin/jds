@@ -79,7 +79,8 @@ class LookupServiceTest {
         true,
         "jdbc:h2:mem:",
         "sa",
-        null)
+        null,
+        "org.h2.Driver")
 
     private val schemaSQL = SchemaSQL(
         SCHEMA_ID,
@@ -89,8 +90,8 @@ class LookupServiceTest {
 
     private val dataProviderLookup = DataProviderSQL(
         DATA_PROVIDER_LOOKUP_ID,
-        SCHEMA_ID,
         "DATA_PROVIDER_LOOKUP",
+        SCHEMA_ID,
         listOf(
             ColumnAttribute("ID", DataType.STRING, 200, ReadOnlyStorage("ID", false, false, false)),
             ColumnAttribute("KEY", DataType.STRING, 200, ReadOnlyStorage("KEY", false, false, false)),
@@ -100,8 +101,8 @@ class LookupServiceTest {
 
     private val dataProviderTest = DataProviderSQL(
         DATA_PROVIDER_TEST_ID,
-        SCHEMA_ID,
         "dataProviderTest",
+        SCHEMA_ID,
         listOf(
             ColumnAttribute(
                 "ID",
@@ -129,8 +130,8 @@ class LookupServiceTest {
 
     private val dataSourceLookup = DataSource(
         DATA_SOURCE_LOOKUP_ID,
-        DATA_PROVIDER_LOOKUP_ID,
         "lookup data source",
+        DATA_PROVIDER_LOOKUP_ID,
         emptySet(),
         emptySet(),
         emptySet())

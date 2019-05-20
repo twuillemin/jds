@@ -10,7 +10,7 @@ import javax.sql.DataSource
 
 @Configuration
 @ComponentScan(basePackages = ["net.wuillemin.jds.dataserver.repository"])
-class CommonDatabaseConfig(private val dataServerProperties: DataServerProperties) {
+class DataServerDatabaseConfig(private val dataServerProperties: DataServerProperties) {
 
     @Bean(name = ["dataserverJdbcTemplate"])
     internal fun dataserverJdbcTemplate(): JdbcTemplate {

@@ -39,9 +39,10 @@ sealed class Server(
 /**
  * Represents a SQL server
  *
- * @param jdbcConnectionString The JDBC connection string
+ * @param jdbcURL The JDBC connection string
  * @param userName The user name to connect
  * @param password The password to connect
+ * @param driverClassName The driver of the connection
  */
 data class ServerSQL(
     // Inherited properties
@@ -50,14 +51,15 @@ data class ServerSQL(
     override val groupId: Long,
     override val customerDefined: Boolean,
     // Specific properties
-    val jdbcConnectionString: String,
+    val jdbcURL: String,
     val userName: String?,
-    val password: String?
+    val password: String?,
+    val driverClassName: String
 ) : Server(id, name, groupId, customerDefined) {
 
     override fun copyWithoutSensitiveInformation(): Server {
         return copy(
-            jdbcConnectionString = "*****",
+            jdbcURL = "*****",
             userName = "*****",
             password = "*****"
         )
@@ -69,7 +71,7 @@ data class ServerSQL(
  *
  * @param userName The name of the user
  * @param password The password of the user
- * @param linkToWorkBook The link to the resource
+ * @param workbookURL The link to the resource
  * @param accessDetails The access information
  */
 data class ServerGSheet(
@@ -79,18 +81,16 @@ data class ServerGSheet(
     override val groupId: Long,
     override val customerDefined: Boolean,
     // Specific properties
+    val workbookURL: String,
     val userName: String,
-    val password: String,
-    val linkToWorkBook: String,
-    val accessDetails: Map<String, String>
+    val password: String
 ) : Server(id, name, groupId, customerDefined) {
 
     override fun copyWithoutSensitiveInformation(): Server {
         return copy(
             userName = "*****",
             password = "*****",
-            linkToWorkBook = "*****",
-            accessDetails = emptyMap()
+            workbookURL = "*****"
         )
     }
 }

@@ -98,15 +98,16 @@ class SQLConnectionCache(
 
         logger.info("getConnectionPoolForServer: Adding connection pool for server ${server.getLoggingId()}")
 
-        val connectionInformation = ConnectionInformation(server.jdbcConnectionString, server.userName, server.password)
+        val connectionInformation = ConnectionInformation(server.jdbcURL, server.userName, server.password, server.driverClassName)
 
         return connectionPoolByConnectionInformation[connectionInformation]
             ?: run {
 
                 val config = HikariConfig()
-                config.jdbcUrl = server.jdbcConnectionString
+                config.jdbcUrl = server.jdbcURL
                 config.username = server.userName
                 config.password = server.password
+                config.driverClassName = server.driverClassName
                 config.addDataSourceProperty("cachePrepStmts", "true")
                 config.addDataSourceProperty("prepStmtCacheSize", "250")
                 config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
@@ -122,21 +123,16 @@ class SQLConnectionCache(
     /**
      * An internal class to keep the unique information about a connection so that it could
      * be associated with a connection pool
+     *
+     * @param jdbcUrl The url of the connection
+     * @param username The user of the connection
+     * @param password The password of the connection
+     * @param driverClassName The driver of the connection
      */
     data class ConnectionInformation(
-        /**
-         * The url of the connection
-         */
         val jdbcUrl: String,
-
-        /**
-         * The user of the connection
-         */
         val username: String?,
-
-        /**
-         * The password of the connection
-         */
-        val password: String?
+        val password: String?,
+        val driverClassName: String
     )
 }

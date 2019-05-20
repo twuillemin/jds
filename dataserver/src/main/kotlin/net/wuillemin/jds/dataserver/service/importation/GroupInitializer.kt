@@ -105,7 +105,8 @@ class GroupInitializer(
                         false,
                         hostingServer.jdbcConnectionUrl,
                         hostingServer.user,
-                        hostingServer.password))
+                        hostingServer.password,
+                        hostingServer.driverClassName))
 
                 val schema = schemaService.addSchema(
                     SchemaSQL(

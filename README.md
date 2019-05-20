@@ -19,10 +19,7 @@ adaptable.
 
 ## Dependencies
 
-Dependencies are :
- 
- * A PostgreSQL server for storing the structured data
- * A MongoDB server for storing the software configuration (may change with the time) 
+The only dependencies is the usage of a PostgreSQL server.
  
 # General workflow
 

@@ -62,8 +62,8 @@ class SQLQueryImporter(
 
                 return DataProviderSQL(
                     null,
-                    schemaId,
                     name,
+                    schemaId,
                     columns,
                     editable,
                     query)

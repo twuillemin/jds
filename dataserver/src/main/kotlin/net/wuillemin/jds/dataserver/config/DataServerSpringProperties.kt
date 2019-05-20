@@ -1,9 +1,6 @@
 package net.wuillemin.jds.dataserver.config
 
-import net.wuillemin.jds.common.config.CommonProperties
-import net.wuillemin.jds.common.config.CommonSpringProperties
 import org.springframework.beans.factory.BeanCreationException
-import org.springframework.boot.autoconfigure.mongo.MongoProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -36,7 +33,7 @@ class DataServerSpringProperties {
         val configuration = checkAndConvertDatabaseDefinition(configurationDatabase)
 
         // Valid the base attributes
-        val storage = storageDatabases.map { checkAndConvertDatabaseDefinition(it)}
+        val storage = storageDatabases.map { checkAndConvertDatabaseDefinition(it) }
 
         if (storage.isEmpty()) {
             throw BeanCreationException("There must be at least a database defined in 'storageDatabases'")
@@ -81,9 +78,9 @@ class DataServerSpringProperties {
         var driverClassName: String? = null
     }
 
-    private fun checkAndConvertDatabaseDefinition(db: SQLDatabaseProperties?) : DataServerProperties.SQLDatabaseProperties {
+    private fun checkAndConvertDatabaseDefinition(db: SQLDatabaseProperties?): DataServerProperties.SQLDatabaseProperties {
 
-        db ?:throw BeanCreationException("The property 'commonDatabase' of the database must not be blank")
+        db ?: throw BeanCreationException("The property 'commonDatabase' of the database must not be blank")
 
         val url = db.url
         if (url.isNullOrBlank())
