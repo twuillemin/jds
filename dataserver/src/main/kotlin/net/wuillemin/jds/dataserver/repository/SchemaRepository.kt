@@ -5,6 +5,7 @@ import net.wuillemin.jds.dataserver.entity.model.SchemaGSheet
 import net.wuillemin.jds.dataserver.entity.model.SchemaSQL
 import net.wuillemin.jds.dataserver.entity.model.Server
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.repository.CrudRepository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
@@ -30,7 +31,8 @@ private const val TYPE_GSHEET = "gsheet"
 @Repository
 class SchemaRepository(
     @Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate,
-    private val dataProviderRepository: DataProviderRepository) : CrudRepository<Schema, Long> {
+    private val dataProviderRepository: DataProviderRepository
+) : CrudRepository<Schema, Long> {
 
     private val schemaSelectColumns = "id, type, name, server_id, sql_role_name"
 
@@ -52,7 +54,7 @@ class SchemaRepository(
      *
      * @return all schemas
      */
-    override fun findAll(): Iterable<Schema> {
+    override fun findAll(): List<Schema> {
         return jdbcTemplate.query("SELECT $schemaSelectColumns FROM jds_schema", schemaRowMapper)
     }
 
@@ -62,7 +64,7 @@ class SchemaRepository(
      * @param ids The ids
      * @return the schemas
      */
-    override fun findAllById(ids: Iterable<Long>): Iterable<Schema> {
+    override fun findAllById(ids: Iterable<Long>): List<Schema> {
         return namedTemplate.query(
             "SELECT $schemaSelectColumns FROM jds_schema WHERE id IN (:ids)",
             MapSqlParameterSource("ids", ids),
@@ -75,7 +77,7 @@ class SchemaRepository(
      * @param serverId The id of the server referenced
      * @return the list of schema referencing the giver server id
      */
-    fun findByServerId(serverId: Long): List<Schema> {
+    fun findAllByServerId(serverId: Long): List<Schema> {
         return jdbcTemplate.query(
             "SELECT $schemaSelectColumns FROM jds_schema WHERE server_id = ?",
             arrayOf<Any>(serverId),
@@ -88,7 +90,7 @@ class SchemaRepository(
      * @param serverIds The list of ids of the server referenced
      * @return the list of schema referencing the giver server ids
      */
-    fun findByServerIdIn(serverIds: List<Long>): List<Schema> {
+    fun findAllByServerIdIn(serverIds: List<Long>): List<Schema> {
         return namedTemplate.query(
             "SELECT $schemaSelectColumns FROM jds_schema WHERE server_id IN (:serverIds)",
             MapSqlParameterSource("serverIds", serverIds),
@@ -117,11 +119,16 @@ class SchemaRepository(
      * @return the schema with the given id or {@literal Optional#empty()} if none found
      */
     override fun findById(id: Long): Optional<Schema> {
-        return Optional.ofNullable(
-            jdbcTemplate.queryForObject(
-                "SELECT $schemaSelectColumns FROM jds_schema WHERE id = ?",
-                arrayOf<Any>(id),
-                schemaRowMapper))
+        return try {
+            return Optional.ofNullable(
+                jdbcTemplate.queryForObject(
+                    "SELECT $schemaSelectColumns FROM jds_schema WHERE id = ?",
+                    arrayOf<Any>(id),
+                    schemaRowMapper))
+        }
+        catch (e: EmptyResultDataAccessException) {
+            Optional.empty()
+        }
     }
 
     /**
@@ -164,9 +171,14 @@ class SchemaRepository(
      * @param schemas The schemas to delete
      */
     override fun deleteAll(schemas: Iterable<Schema>) {
+
+        val schemaIds = schemas.mapNotNull { it.id }
+
+        dataProviderRepository.deleteAll(dataProviderRepository.findAllBySchemaIdIn(schemaIds))
+
         namedTemplate.update(
             "DELETE FROM jds_schema WHERE id IN (:ids)",
-            MapSqlParameterSource("ids", schemas.mapNotNull { it.id }))
+            MapSqlParameterSource("ids", schemaIds))
     }
 
     /**
@@ -176,11 +188,7 @@ class SchemaRepository(
      */
     override fun delete(schema: Schema) {
         schema.id
-            ?.let { schemaId ->
-                jdbcTemplate.update(
-                    "DELETE FROM jds_schema WHERE id = ?",
-                    arrayOf<Any>(schemaId))
-            }
+            ?.let { schemaId -> deleteById(schemaId) }
             ?: throw IllegalArgumentException("Unable to delete a non persisted Schema object")
     }
 
@@ -190,9 +198,10 @@ class SchemaRepository(
      * @param id The id to delete
      */
     override fun deleteById(id: Long) {
-        jdbcTemplate.update(
-            "DELETE FROM jds_schema WHERE id = ?",
-            arrayOf<Any>(id))
+
+        dataProviderRepository.deleteAll(dataProviderRepository.findAllBySchemaId(id))
+
+        jdbcTemplate.update("DELETE FROM jds_schema WHERE id = ?", id)
     }
 
     /**
@@ -266,7 +275,7 @@ class SchemaRepository(
                     ps.setString(4, schema.roleName)
                 }
                 is SchemaGSheet -> {
-                    ps.setString(1, TYPE_SQL)
+                    ps.setString(1, TYPE_GSHEET)
                     ps.setString(2, schema.name)
                     ps.setLong(3, schema.serverId)
                     ps.setNull(4, java.sql.Types.VARCHAR)

@@ -30,7 +30,8 @@ private const val TYPE_GSHEET = "gsheet"
 @Repository
 class ServerRepository(
     @Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate,
-    private val schemaRepository: SchemaRepository) : CrudRepository<Server, Long> {
+    private val schemaRepository: SchemaRepository
+) : CrudRepository<Server, Long> {
 
     private val serverSelectColumns = "id, type, name, group_id, customer_defined, sql_jdbc_url, sql_user_name, sql_password, sql_driver_class_name, gsheet_workbook_url, gsheet_user_name, gsheet_password"
 
@@ -52,7 +53,7 @@ class ServerRepository(
      *
      * @return all servers
      */
-    override fun findAll(): Iterable<Server> {
+    override fun findAll(): List<Server> {
         return jdbcTemplate.query("SELECT $serverSelectColumns FROM jds_server", serverRowMapper)
     }
 
@@ -62,7 +63,7 @@ class ServerRepository(
      * @param ids The ids
      * @return the servers
      */
-    override fun findAllById(ids: Iterable<Long>): Iterable<Server> {
+    override fun findAllById(ids: Iterable<Long>): List<Server> {
         return namedTemplate.query(
             "SELECT $serverSelectColumns FROM jds_server WHERE id IN (:ids)",
             MapSqlParameterSource("ids", ids),
@@ -74,7 +75,7 @@ class ServerRepository(
      * @param groupIds The id of the groups
      * @return a list of servers
      */
-    fun findAllByGroupIdIn(groupIds: Iterable<Long>): Iterable<Server> {
+    fun findAllByGroupIdIn(groupIds: Iterable<Long>): List<Server> {
         return namedTemplate.query(
             "SELECT $serverSelectColumns FROM jds_server WHERE group_id IN (:groupIds)",
             MapSqlParameterSource("groupIds", groupIds),
@@ -157,7 +158,8 @@ class ServerRepository(
     override fun deleteAll(servers: Iterable<Server>) {
 
         val serverIds = servers.mapNotNull { it.id }
-        schemaRepository.deleteAll(schemaRepository.findByServerIdIn(serverIds))
+
+        schemaRepository.deleteAll(schemaRepository.findAllByServerIdIn(serverIds))
 
         namedTemplate.update(
             "DELETE FROM jds_server WHERE id IN (:ids)",
@@ -182,7 +184,7 @@ class ServerRepository(
      */
     override fun deleteById(id: Long) {
 
-        schemaRepository.deleteAll(schemaRepository.findByServerIdIn(listOf(id)))
+        schemaRepository.deleteAll(schemaRepository.findAllByServerIdIn(listOf(id)))
 
         jdbcTemplate.update("DELETE FROM jds_server WHERE id = ?", id)
     }

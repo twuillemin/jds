@@ -3,6 +3,7 @@ package net.wuillemin.jds.dataserver.repository
 import net.wuillemin.jds.dataserver.entity.model.DataProvider
 import net.wuillemin.jds.dataserver.entity.model.DataSource
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.repository.CrudRepository
 import org.springframework.jdbc.core.BatchPreparedStatementSetter
 import org.springframework.jdbc.core.JdbcTemplate
@@ -63,7 +64,7 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      * @param ids The ids
      * @return the dataSources
      */
-    override fun findAllById(ids: Iterable<Long>): Iterable<DataSource> {
+    override fun findAllById(ids: Iterable<Long>): List<DataSource> {
         return namedTemplate.query(
             "SELECT $dataSourceSelectColumns FROM jds_datasource WHERE id IN (:ids)",
             MapSqlParameterSource("ids", ids),
@@ -76,7 +77,7 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      * @param dataProviderId The id of the data provider referenced
      * @return the list of data sources referencing the given data provider id
      */
-    fun findByDataProviderId(dataProviderId: Long): List<DataSource> {
+    fun findAllByDataProviderId(dataProviderId: Long): List<DataSource> {
         return jdbcTemplate.query(
             "SELECT $dataSourceSelectColumns FROM jds_datasource WHERE data_provider_id = ?",
             arrayOf<Any>(dataProviderId),
@@ -89,7 +90,7 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      * @param dataProviderIds The id of the data providers referenced
      * @return the list of data sources referencing the given data provider ids
      */
-    fun findByDataProviderIdIn(dataProviderIds: List<Long>): List<DataSource> {
+    fun findAllByDataProviderIdIn(dataProviderIds: List<Long>): List<DataSource> {
         return namedTemplate.query(
             "SELECT $dataSourceSelectColumns FROM jds_datasource WHERE data_provider_id IN (:dataProviderIds)",
             MapSqlParameterSource("dataProviderIds", dataProviderIds),
@@ -102,7 +103,7 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      * @param userId The id of the user
      * @return the list of data sources referencing the given user id
      */
-    fun findByUserAllowedToReadIds(userId: Long): List<DataSource> {
+    fun findAllByUserAllowedToReadId(userId: Long): List<DataSource> {
 
         return jdbcTemplate.query(
             "SELECT $dataSourceSelectColumns FROM jds_datasource WHERE id IN (SELECT DISTINCT(data_source_id) FROM jds_datasource_user WHERE user_id = ?)",
@@ -132,11 +133,16 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      * @return the dataSource with the given id or {@literal Optional#empty()} if none found
      */
     override fun findById(id: Long): Optional<DataSource> {
-        return Optional.ofNullable(
-            jdbcTemplate.queryForObject(
-                "SELECT $dataSourceSelectColumns FROM jds_datasource WHERE id = ?",
-                arrayOf<Any>(id),
-                dataSourceRowMapper))
+        return try {
+            return Optional.ofNullable(
+                jdbcTemplate.queryForObject(
+                    "SELECT $dataSourceSelectColumns FROM jds_datasource WHERE id = ?",
+                    arrayOf<Any>(id),
+                    dataSourceRowMapper))
+        }
+        catch (e: EmptyResultDataAccessException) {
+            Optional.empty()
+        }
     }
 
     /**
@@ -180,15 +186,15 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      */
     override fun deleteAll(dataSources: Iterable<DataSource>) {
 
-        val ids = dataSources.mapNotNull { it.id }
+        val dataSourceIds = dataSources.mapNotNull { it.id }
 
         namedTemplate.update(
-            "DELETE FROM jds_datasource_user WHERE data_source_id IN (:ids)",
-            MapSqlParameterSource("ids", ids))
+            "DELETE FROM jds_datasource_user WHERE data_source_id IN (:dataSourceIds)",
+            MapSqlParameterSource("dataSourceIds", dataSourceIds))
 
         namedTemplate.update(
-            "DELETE FROM jds_datasource WHERE id IN (:ids)",
-            MapSqlParameterSource("ids", ids))
+            "DELETE FROM jds_datasource WHERE id IN (:dataSourceIds)",
+            MapSqlParameterSource("dataSourceIds", dataSourceIds))
     }
 
     /**
@@ -198,16 +204,7 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      */
     override fun delete(dataSource: DataSource) {
         dataSource.id
-            ?.let { dataSourceId ->
-
-                jdbcTemplate.update(
-                    "DELETE FROM jds_datasource_user WHERE data_source_id = ?",
-                    arrayOf<Any>(dataSourceId))
-
-                jdbcTemplate.update(
-                    "DELETE FROM jds_datasource WHERE id = ?",
-                    arrayOf<Any>(dataSourceId))
-            }
+            ?.let { dataSourceId -> deleteById(dataSourceId) }
             ?: throw IllegalArgumentException("Unable to delete a non persisted DataSource object")
     }
 
@@ -218,13 +215,8 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      */
     override fun deleteById(id: Long) {
 
-        jdbcTemplate.update(
-            "DELETE FROM jds_datasource_user WHERE data_source_id = ?",
-            arrayOf<Any>(id))
-
-        jdbcTemplate.update(
-            "DELETE FROM jds_datasource WHERE id = ?",
-            arrayOf<Any>(id))
+        jdbcTemplate.update("DELETE FROM jds_datasource_user WHERE data_source_id = ?", id)
+        jdbcTemplate.update("DELETE FROM jds_datasource WHERE id = ?", id)
     }
 
     /**
@@ -258,9 +250,7 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
             }
 
         // Delete old related users
-        jdbcTemplate.update(
-            "DELETE FROM jds_datasource_user WHERE data_source_id = ?",
-            arrayOf<Any>(dataSourceId))
+        jdbcTemplate.update("DELETE FROM jds_datasource_user WHERE data_source_id = ?", dataSourceId)
 
         val deleterIds = dataSource.userAllowedToDeleteIds.toList()
         val writerIds = (dataSource.userAllowedToWriteIds - dataSource.userAllowedToDeleteIds).toList()

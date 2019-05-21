@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS jds_dataprovider_column
     column_index            INT     NOT NULL,
     type                    VARCHAR NOT NULL,
     name                    VARCHAR NOT NULL,
+    data_type               VARCHAR NOT NULL,
     size                    INT     NOT NULL,
     lookup_maximum_number   INT              DEFAULT NULL,
     lookup_data_source_id   BIGINT           DEFAULT NULL,

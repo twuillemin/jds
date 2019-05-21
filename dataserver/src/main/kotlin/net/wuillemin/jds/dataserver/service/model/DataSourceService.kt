@@ -49,7 +49,7 @@ class DataSourceService(
 
         return dataProvider.id
             ?.let { dataProviderId ->
-                dataSourceRepository.findByDataProviderId(dataProviderId)
+                dataSourceRepository.findAllByDataProviderId(dataProviderId)
             }
             ?: throw BadParameterException(E.service.model.dataSource.getForDataProviderNoId)
     }
@@ -72,7 +72,7 @@ class DataSourceService(
 
         }
 
-        return dataSourceRepository.findByDataProviderIdIn(dataProviderIds)
+        return dataSourceRepository.findAllByDataProviderIdIn(dataProviderIds)
     }
 
     /**
@@ -82,7 +82,7 @@ class DataSourceService(
      * @return the data sources
      */
     fun getDataSourcesForReaderId(userId: Long): List<DataSource> {
-        return dataSourceRepository.findByUserAllowedToReadIds(userId)
+        return dataSourceRepository.findAllByUserAllowedToReadId(userId)
     }
 
     /**

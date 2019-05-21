@@ -52,7 +52,7 @@ class SchemaService(
 
         return server.id
             ?.let { serverId ->
-                schemaRepository.findByServerId(serverId).toList()
+                schemaRepository.findAllByServerId(serverId).toList()
             }
             ?: throw BadParameterException(E.service.model.schema.getForServerNoId)
 
@@ -76,7 +76,7 @@ class SchemaService(
 
         }
 
-        return schemaRepository.findByServerIdIn(serverIds)
+        return schemaRepository.findAllByServerIdIn(serverIds)
     }
 
     /**

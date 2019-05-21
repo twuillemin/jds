@@ -1,6 +1,5 @@
 package net.wuillemin.jds.dataserver.config
 
-import net.wuillemin.jds.common.config.CommonConfigTest
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -12,7 +11,7 @@ import javax.sql.DataSource
 
 
 @ComponentScan(basePackages = ["net.wuillemin.jds.dataserver.repository"])
-@Import(CommonConfigTest::class)
+@Import(DataServerConfigTest::class)
 class DataServerConfigDataBaseTest {
 
     @Bean(name = ["dataserverJdbcTemplate"])

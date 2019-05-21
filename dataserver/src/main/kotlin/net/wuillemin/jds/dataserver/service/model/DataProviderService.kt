@@ -52,7 +52,7 @@ class DataProviderService(
 
         return schema.id
             ?.let { schemaId ->
-                dataProviderRepository.findBySchemaId(schemaId)
+                dataProviderRepository.findAllBySchemaId(schemaId)
             }
             ?: throw BadParameterException(E.service.model.dataProvider.getForSchemaNotPersisted)
 
@@ -76,7 +76,7 @@ class DataProviderService(
 
         }
 
-        return dataProviderRepository.findBySchemaIdIn(schemaIds)
+        return dataProviderRepository.findAllBySchemaIdIn(schemaIds)
     }
 
     /**

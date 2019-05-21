@@ -11,6 +11,7 @@ import net.wuillemin.jds.dataserver.entity.model.ReadOnlyStorage
 import net.wuillemin.jds.dataserver.entity.model.Schema
 import net.wuillemin.jds.dataserver.entity.model.WritableStorage
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.repository.CrudRepository
 import org.springframework.jdbc.core.BatchPreparedStatementSetter
 import org.springframework.jdbc.core.JdbcTemplate
@@ -41,7 +42,8 @@ private const val TYPE_STORAGE_WRITABLE = "writable"
 @Repository
 class DataProviderRepository(
     @Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate,
-    private val dataSourceRepository: DataSourceRepository) : CrudRepository<DataProvider, Long> {
+    private val dataSourceRepository: DataSourceRepository
+) : CrudRepository<DataProvider, Long> {
 
     private val dataProviderSelectColumns = "id, type, name, schema_id, editable, sql_query, gsheet_sheet_name"
     private val dataProviderRowMapper = DataProviderRowMapper()
@@ -75,7 +77,7 @@ class DataProviderRepository(
      * @param ids The ids
      * @return the dataProviders
      */
-    override fun findAllById(ids: Iterable<Long>): Iterable<DataProvider> {
+    override fun findAllById(ids: Iterable<Long>): List<DataProvider> {
         return namedTemplate.query(
             "SELECT $dataProviderSelectColumns FROM jds_dataprovider WHERE id IN (:ids)",
             MapSqlParameterSource("ids", ids),
@@ -88,7 +90,7 @@ class DataProviderRepository(
      * @param schemaId The id of the schema referenced
      * @return the list of data providers referencing the given schema id
      */
-    fun findBySchemaId(schemaId: Long): List<DataProvider> {
+    fun findAllBySchemaId(schemaId: Long): List<DataProvider> {
         return jdbcTemplate.query(
             "SELECT $dataProviderSelectColumns FROM jds_dataprovider WHERE schema_id = ?",
             arrayOf<Any>(schemaId),
@@ -101,7 +103,7 @@ class DataProviderRepository(
      * @param schemaIds The id of the schemas referenced
      * @return the list of data providers referencing the given schema ids
      */
-    fun findBySchemaIdIn(schemaIds: List<Long>): List<DataProvider> {
+    fun findAllBySchemaIdIn(schemaIds: List<Long>): List<DataProvider> {
         return namedTemplate.query(
             "SELECT $dataProviderSelectColumns FROM jds_dataprovider WHERE schema_id IN (:schemaIds)",
             MapSqlParameterSource("schemaIds", schemaIds),
@@ -130,11 +132,16 @@ class DataProviderRepository(
      * @return the dataProvider with the given id or {@literal Optional#empty()} if none found
      */
     override fun findById(id: Long): Optional<DataProvider> {
-        return Optional.ofNullable(
-            jdbcTemplate.queryForObject(
-                "SELECT $dataProviderSelectColumns FROM jds_dataprovider WHERE id = ?",
-                arrayOf<Any>(id),
-                dataProviderRowMapper))
+        return try {
+            return Optional.ofNullable(
+                jdbcTemplate.queryForObject(
+                    "SELECT $dataProviderSelectColumns FROM jds_dataprovider WHERE id = ?",
+                    arrayOf<Any>(id),
+                    dataProviderRowMapper))
+        }
+        catch (e: EmptyResultDataAccessException) {
+            Optional.empty()
+        }
     }
 
     /**
@@ -179,14 +186,18 @@ class DataProviderRepository(
      */
     override fun deleteAll(dataProviders: Iterable<DataProvider>) {
 
+        val dataProviderIds = dataProviders.mapNotNull { it.id }
+
+        dataSourceRepository.deleteAll(dataSourceRepository.findAllByDataProviderIdIn(dataProviderIds))
+
         // Delete the columns
         namedTemplate.update(
-            "DELETE FROM jds_dataprovider_column WHERE dataprovider_id IN (:ids)",
-            MapSqlParameterSource("ids", dataProviders.mapNotNull { it.id }))
+            "DELETE FROM jds_dataprovider_column WHERE data_provider_id IN (:ids)",
+            MapSqlParameterSource("ids", dataProviderIds))
 
         namedTemplate.update(
             "DELETE FROM jds_dataprovider WHERE id IN (:ids)",
-            MapSqlParameterSource("ids", dataProviders.mapNotNull { it.id }))
+            MapSqlParameterSource("ids", dataProviderIds))
     }
 
     /**
@@ -196,16 +207,7 @@ class DataProviderRepository(
      */
     override fun delete(dataProvider: DataProvider) {
         dataProvider.id
-            ?.let { dataProviderId ->
-
-                jdbcTemplate.update(
-                    "DELETE FROM jds_dataprovider_column WHERE dataprovider_id = ?",
-                    arrayOf<Any>(dataProviderId))
-
-                jdbcTemplate.update(
-                    "DELETE FROM jds_dataprovider WHERE id = ?",
-                    arrayOf<Any>(dataProviderId))
-            }
+            ?.let { dataProviderId -> deleteById(dataProviderId) }
             ?: throw IllegalArgumentException("Unable to delete a non persisted DataProvider object")
     }
 
@@ -216,13 +218,11 @@ class DataProviderRepository(
      */
     override fun deleteById(id: Long) {
 
-        jdbcTemplate.update(
-            "DELETE FROM jds_dataprovider_column WHERE dataprovider_id = ?",
-            arrayOf<Any>(id))
+        dataSourceRepository.deleteAll(dataSourceRepository.findAllByDataProviderId(id))
 
-        jdbcTemplate.update(
-            "DELETE FROM jds_dataprovider WHERE id = ?",
-            arrayOf<Any>(id))
+        jdbcTemplate.update("DELETE FROM jds_dataprovider_column WHERE data_provider_id = ?", id)
+
+        jdbcTemplate.update("DELETE FROM jds_dataprovider WHERE id = ?", id)
     }
 
     /**
@@ -261,6 +261,7 @@ class DataProviderRepository(
                         args,
                         arrayOf(
                             java.sql.Types.VARCHAR,
+                            java.sql.Types.VARCHAR,
                             java.sql.Types.BIGINT,
                             java.sql.Types.BOOLEAN,
                             java.sql.Types.VARCHAR,
@@ -281,9 +282,7 @@ class DataProviderRepository(
             }
 
         // Delete old columns
-        jdbcTemplate.update(
-            "DELETE FROM jds_dataprovider_column WHERE dataprovider_id = ?",
-            arrayOf<Any>(dataProviderId))
+        jdbcTemplate.update("DELETE FROM jds_dataprovider_column WHERE data_provider_id = ?", dataProviderId)
 
         // Insert the columns
         this.jdbcTemplate.batchUpdate(
@@ -368,7 +367,7 @@ class DataProviderRepository(
                     ps.setNull(6, java.sql.Types.VARCHAR)
                 }
                 is DataProviderGSheet -> {
-                    ps.setString(1, TYPE_DATAPROVIDER_SQL)
+                    ps.setString(1, TYPE_DATAPROVIDER_GSHEET)
                     ps.setString(2, dataProvider.name)
                     ps.setLong(3, dataProvider.schemaId)
                     ps.setBoolean(4, dataProvider.editable)

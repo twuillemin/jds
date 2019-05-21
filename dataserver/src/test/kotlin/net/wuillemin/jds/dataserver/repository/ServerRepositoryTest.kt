@@ -26,6 +26,7 @@ class ServerRepositoryTest {
         //
         // Test queries on empty repository
         //
+
         Assertions.assertEquals(0, serverRepository.count())
 
         Assertions.assertEquals(0, serverRepository.findAll().toList().size)
@@ -82,11 +83,11 @@ class ServerRepositoryTest {
                 Assertions.assertEquals("user3", server3.userName)
                 Assertions.assertEquals("password3", server3.password)
             }
-            else         -> Assertions.fail()
+            else            -> Assertions.fail()
         }
 
         //
-        // Update existing server
+        // Update existing server SQL -> GSheet
         //
 
         val server1Updated = serverRepository.save(ServerGSheet(server1Id, "Server5", 5, false, "url5", "user5", "password5"))
@@ -99,6 +100,22 @@ class ServerRepositoryTest {
         Assertions.assertEquals("url5", server1Updated.workbookURL)
         Assertions.assertEquals("user5", server1Updated.userName)
         Assertions.assertEquals("password5", server1Updated.password)
+
+        //
+        // Update existing server SQL -> GSheet
+        //
+
+        val server1Updated2 = serverRepository.save(ServerSQL(server1Id, "Server1", 1, true, "url1", "user1", "password1", "driver1"))
+
+        Assertions.assertEquals(4, serverRepository.count())
+        Assertions.assertTrue(serverRepository.findById(server1Id).isPresent)
+        Assertions.assertEquals("Server1", server1Updated2.name)
+        Assertions.assertEquals(1, server1Updated2.groupId)
+        Assertions.assertTrue(server1.customerDefined)
+        Assertions.assertEquals("url1", server1Updated2.jdbcURL)
+        Assertions.assertEquals("user1", server1Updated2.userName)
+        Assertions.assertEquals("password1", server1Updated2.password)
+        Assertions.assertEquals("driver1", server1Updated2.driverClassName)
 
         //
         // Update non existing server
