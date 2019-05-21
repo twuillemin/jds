@@ -170,7 +170,7 @@ class DataSourceRepository(@Qualifier("dataserverJdbcTemplate") private val jdbc
      */
     override fun deleteAll() {
         jdbcTemplate.execute("TRUNCATE TABLE jds_datasource_user")
-        jdbcTemplate.execute("TRUNCATE TABLE jds_datasource")
+        jdbcTemplate.execute("DELETE FROM jds_datasource")
     }
 
     /**

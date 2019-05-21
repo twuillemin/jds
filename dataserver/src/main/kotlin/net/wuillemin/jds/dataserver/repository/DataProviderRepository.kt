@@ -39,7 +39,9 @@ private const val TYPE_STORAGE_WRITABLE = "writable"
  */
 @Suppress("SqlResolve")
 @Repository
-class DataProviderRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate) : CrudRepository<DataProvider, Long> {
+class DataProviderRepository(
+    @Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate,
+    private val dataSourceRepository: DataSourceRepository) : CrudRepository<DataProvider, Long> {
 
     private val dataProviderSelectColumns = "id, type, name, schema_id, editable, sql_query, gsheet_sheet_name"
     private val dataProviderRowMapper = DataProviderRowMapper()
@@ -101,7 +103,7 @@ class DataProviderRepository(@Qualifier("dataserverJdbcTemplate") private val jd
      */
     fun findBySchemaIdIn(schemaIds: List<Long>): List<DataProvider> {
         return namedTemplate.query(
-            "SELECT $dataProviderSelectColumns FROM jds_dataprovider WHERE server_id IN (:schemaIds)",
+            "SELECT $dataProviderSelectColumns FROM jds_dataprovider WHERE schema_id IN (:schemaIds)",
             MapSqlParameterSource("schemaIds", schemaIds),
             dataProviderRowMapper)
     }
@@ -165,7 +167,9 @@ class DataProviderRepository(@Qualifier("dataserverJdbcTemplate") private val jd
      * Deletes all entities managed by the repository.
      */
     override fun deleteAll() {
-        jdbcTemplate.execute("TRUNCATE TABLE jds_dataprovider")
+        dataSourceRepository.deleteAll()
+        jdbcTemplate.execute("TRUNCATE TABLE jds_dataprovider_column")
+        jdbcTemplate.execute("DELETE FROM jds_dataprovider")
     }
 
     /**
@@ -281,9 +285,9 @@ class DataProviderRepository(@Qualifier("dataserverJdbcTemplate") private val jd
             "DELETE FROM jds_dataprovider_column WHERE dataprovider_id = ?",
             arrayOf<Any>(dataProviderId))
 
-        // Insert the admin and the users
+        // Insert the columns
         this.jdbcTemplate.batchUpdate(
-            "INSERT INTO jds_group_user(data_provider_id, column_index, type, name, data_type, size, lookup_maximum_number, lookup_data_source_id, lookup_key_column, lookup_value_column, storage_type, storage_nullable, storage_primary_key, storage_auto_increment, storage_read_attr_name, storage_write_attr_name, storage_container_name) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO jds_dataprovider_column(data_provider_id, column_index, type, name, data_type, size, lookup_maximum_number, lookup_data_source_id, lookup_key_column, lookup_value_column, storage_type, storage_nullable, storage_primary_key, storage_auto_increment, storage_read_attr_name, storage_write_attr_name, storage_container_name) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             object : BatchPreparedStatementSetter {
 
                 @Throws(SQLException::class)

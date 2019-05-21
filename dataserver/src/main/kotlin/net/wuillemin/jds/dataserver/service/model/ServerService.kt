@@ -47,7 +47,7 @@ class ServerService(
      * @return the servers
      */
     fun getServersForGroupIds(groupIds: List<Long>): List<Server> {
-        return serverRepository.findByGroupIdIn(groupIds).toList()
+        return serverRepository.findAllByGroupIdIn(groupIds).toList()
     }
 
     /**

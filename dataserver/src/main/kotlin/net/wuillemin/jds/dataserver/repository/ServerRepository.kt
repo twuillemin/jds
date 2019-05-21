@@ -4,6 +4,7 @@ import net.wuillemin.jds.dataserver.entity.model.Server
 import net.wuillemin.jds.dataserver.entity.model.ServerGSheet
 import net.wuillemin.jds.dataserver.entity.model.ServerSQL
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.repository.CrudRepository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
@@ -27,7 +28,9 @@ private const val TYPE_GSHEET = "gsheet"
  */
 @Suppress("SqlResolve")
 @Repository
-class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate) : CrudRepository<Server, Long> {
+class ServerRepository(
+    @Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate,
+    private val schemaRepository: SchemaRepository) : CrudRepository<Server, Long> {
 
     private val serverSelectColumns = "id, type, name, group_id, customer_defined, sql_jdbc_url, sql_user_name, sql_password, sql_driver_class_name, gsheet_workbook_url, gsheet_user_name, gsheet_password"
 
@@ -71,7 +74,7 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      * @param groupIds The id of the groups
      * @return a list of servers
      */
-    fun findByGroupIdIn(groupIds: Iterable<Long>): Iterable<Server> {
+    fun findAllByGroupIdIn(groupIds: Iterable<Long>): Iterable<Server> {
         return namedTemplate.query(
             "SELECT $serverSelectColumns FROM jds_server WHERE group_id IN (:groupIds)",
             MapSqlParameterSource("groupIds", groupIds),
@@ -100,11 +103,16 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      * @return the server with the given id or {@literal Optional#empty()} if none found
      */
     override fun findById(id: Long): Optional<Server> {
-        return Optional.ofNullable(
-            jdbcTemplate.queryForObject(
-                "SELECT $serverSelectColumns FROM jds_server WHERE id = ?",
-                arrayOf<Any>(id),
-                serverRowMapper))
+        return try {
+            Optional.ofNullable(
+                jdbcTemplate.queryForObject(
+                    "SELECT $serverSelectColumns FROM jds_server WHERE id = ?",
+                    arrayOf<Any>(id),
+                    serverRowMapper))
+        }
+        catch (e: EmptyResultDataAccessException) {
+            Optional.empty()
+        }
     }
 
     /**
@@ -137,7 +145,8 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      * Deletes all entities managed by the repository.
      */
     override fun deleteAll() {
-        jdbcTemplate.execute("TRUNCATE TABLE jds_server")
+        schemaRepository.deleteAll()
+        jdbcTemplate.execute("DELETE FROM jds_server")
     }
 
     /**
@@ -146,9 +155,13 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      * @param servers The servers to delete
      */
     override fun deleteAll(servers: Iterable<Server>) {
+
+        val serverIds = servers.mapNotNull { it.id }
+        schemaRepository.deleteAll(schemaRepository.findByServerIdIn(serverIds))
+
         namedTemplate.update(
             "DELETE FROM jds_server WHERE id IN (:ids)",
-            MapSqlParameterSource("ids", servers.mapNotNull { it.id }))
+            MapSqlParameterSource("ids", serverIds))
     }
 
     /**
@@ -158,11 +171,7 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      */
     override fun delete(server: Server) {
         server.id
-            ?.let { serverId ->
-                jdbcTemplate.update(
-                    "DELETE FROM jds_server WHERE id = ?",
-                    arrayOf<Any>(serverId))
-            }
+            ?.let { deleteById(it) }
             ?: throw IllegalArgumentException("Unable to delete a non persisted Server object")
     }
 
@@ -172,9 +181,10 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      * @param id The id to delete
      */
     override fun deleteById(id: Long) {
-        jdbcTemplate.update(
-            "DELETE FROM jds_server WHERE id = ?",
-            arrayOf<Any>(id))
+
+        schemaRepository.deleteAll(schemaRepository.findByServerIdIn(listOf(id)))
+
+        jdbcTemplate.update("DELETE FROM jds_server WHERE id = ?", id)
     }
 
     /**
@@ -276,7 +286,7 @@ class ServerRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
                     ps.setNull(11, java.sql.Types.VARCHAR)
                 }
                 is ServerGSheet -> {
-                    ps.setString(1, TYPE_SQL)
+                    ps.setString(1, TYPE_GSHEET)
                     ps.setString(2, server.name)
                     ps.setLong(3, server.groupId)
                     ps.setBoolean(4, server.customerDefined)

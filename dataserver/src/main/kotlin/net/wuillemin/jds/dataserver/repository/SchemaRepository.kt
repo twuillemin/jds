@@ -28,7 +28,9 @@ private const val TYPE_GSHEET = "gsheet"
  */
 @Suppress("SqlResolve")
 @Repository
-class SchemaRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate) : CrudRepository<Schema, Long> {
+class SchemaRepository(
+    @Qualifier("dataserverJdbcTemplate") private val jdbcTemplate: JdbcTemplate,
+    private val dataProviderRepository: DataProviderRepository) : CrudRepository<Schema, Long> {
 
     private val schemaSelectColumns = "id, type, name, server_id, sql_role_name"
 
@@ -152,7 +154,8 @@ class SchemaRepository(@Qualifier("dataserverJdbcTemplate") private val jdbcTemp
      * Deletes all entities managed by the repository.
      */
     override fun deleteAll() {
-        jdbcTemplate.execute("TRUNCATE TABLE jds_schema")
+        dataProviderRepository.deleteAll()
+        jdbcTemplate.execute("DELETE FROM jds_schema")
     }
 
     /**

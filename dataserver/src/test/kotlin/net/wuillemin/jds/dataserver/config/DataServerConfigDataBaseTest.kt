@@ -1,5 +1,6 @@
-package net.wuillemin.jds.common.config
+package net.wuillemin.jds.dataserver.config
 
+import net.wuillemin.jds.common.config.CommonConfigTest
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -10,16 +11,16 @@ import org.springframework.jdbc.datasource.init.ScriptUtils
 import javax.sql.DataSource
 
 
-@ComponentScan(basePackages = ["net.wuillemin.jds.common.repository"])
+@ComponentScan(basePackages = ["net.wuillemin.jds.dataserver.repository"])
 @Import(CommonConfigTest::class)
-class CommonConfigDataBaseTest {
+class DataServerConfigDataBaseTest {
 
-    @Bean(name = ["commonJdbcTemplate"])
+    @Bean(name = ["dataserverJdbcTemplate"])
     internal fun commonJdbcTemplate(): JdbcTemplate {
         return JdbcTemplate(commonDataSource())
     }
 
-    @Bean(name = ["commonDatabaseJDBC"])
+    @Bean(name = ["dataserverDatabaseJDBC"])
     fun commonDataSource(): DataSource {
 
         return DataSourceBuilder
@@ -31,7 +32,7 @@ class CommonConfigDataBaseTest {
             .build()
             .also {
                 it.connection.use { connection ->
-                    ScriptUtils.executeSqlScript(connection, ClassPathResource("/jdbc/common_create_db_test.sql"))
+                    ScriptUtils.executeSqlScript(connection, ClassPathResource("/jdbc/datserver_create_db_test.sql"))
                 }
             }
     }

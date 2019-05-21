@@ -1,10 +1,10 @@
-CREATE TABLE IF NOT EXISTS  jds_group
+CREATE TABLE IF NOT EXISTS jds_group
 (
     id   BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS  jds_user
+CREATE TABLE IF NOT EXISTS jds_user
 (
     id         BIGINT PRIMARY KEY AUTO_INCREMENT,
     name       VARCHAR NOT NULL,
@@ -15,10 +15,11 @@ CREATE TABLE IF NOT EXISTS  jds_user
     profile    VARCHAR NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS  jds_group_user
+CREATE TABLE IF NOT EXISTS jds_group_user
 (
-    group_id BIGINT NOT NULL REFERENCES jds_group(id),
-    user_id  BIGINT NOT NULL REFERENCES jds_user(id),
-    is_admin BOOLEAN NOT NULL
+    group_id BIGINT  NOT NULL REFERENCES jds_group (id),
+    user_id  BIGINT  NOT NULL REFERENCES jds_user (id),
+    is_admin BOOLEAN NOT NULL,
+    PRIMARY KEY (group_id, user_id)
 );
 
