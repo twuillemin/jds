@@ -20,6 +20,16 @@ adaptable.
 ## Dependencies
 
 The only dependencies is the usage of a PostgreSQL server.
+
+## Version
+
+
+| version | Description |
+| --- | --- |
+|v0.0.2-snapshot | Current development version. Mongo fully removed in favor of PostgresSQL. May work. Need more tests  |
+|v0.0.1 | Original version. Should work reasonably well. Configuration is stored in a Mongo Database. |
+
+
  
 # General workflow
 
@@ -244,9 +254,96 @@ endpoint: `[GET] /api/dataserver/v1/client/{dataSourceId}/data`
 ```
 
 ### Filters
-Filters allow the client to provider a predicate that is applied to the query for retrieving the data.
+Filters allow the client to provider a predicate that is applied to the query for retrieving the data. Filters are
+JSON objects. Although more verbose than a SQL filter, their syntax is consistent and easy to understand.
 
-_TBW_
+Example:
+```json
+{
+  "filter": {
+    "type": "And",
+    "predicates": [
+    {
+      "type": "Or",
+      "predicates": [
+      {
+        "type": "Equal",
+        "left": {
+          "type": "ColumnName",
+          "name": "columnA"
+        },
+        "right": {
+          "type": "Value",
+          "value" : 25
+        }
+      },
+      {
+        "type": "In",
+        "column": {
+          "type": "ColumnName",
+          "name": "columnB"
+        },
+        "values": [
+        {
+          "type": "Value",
+          "value" : "A"
+        },
+        {
+          "type": "Value",
+          "value" : "B"
+        }
+        ]
+      }
+      ]
+    },
+    {
+      "type": "StartsWith",
+      "column": {
+        "type": "ColumnName",
+        "name": "columnC"
+      },
+      "value": {
+        "type": "Value",
+        "value" : "QwErTy"
+      },
+      "caseSensitive": false
+    }
+    ]
+  }
+}
+``` 
+
+is roughly equivalent to SQL:
+
+```sql
+WHERE (columnA = 25 AND columnB IN ('A', 'B')) OR TO_LOWER(columnC) LIKE 'qwerty%'
+
+```
+
+Each object in the filter (request element) is composed of a `type` attribute defining its role and of various attributes. A 
+request element can be a:
+ * Value: attributes are `"type":"Value"` and `"value":<Any>`
+ * Column: attributes are `"type":"Value"` and `"value":<Any>`
+ * Predicate: cf. list here under
+
+The following predicates are available:
+
+| type | First parameter | Second parameter | Third parameter |
+| --- | --- | --- | --- |
+| And | predicates: a list of other predicates |   |   |
+| Or | predicates: a list of other predicates |   |   |
+| Equal | left: the RE on the left hand side | right: the RE on the left right side |   |
+| NotEqual | left: the RE on the left hand side | right: the RE on the left right side |   |
+| GreaterThan | left: the RE on the left hand side | right: the RE on the left right side |   |
+| GreaterThanOrEqual | left: the RE on the left hand side | right: the RE on the left right side |   |
+| LowerThan | left: the RE on the left hand side | right: the RE on the left right side |   |
+| LowerThanOrEqual | left: the RE on the left hand side | right: the RE on the left right side |   |
+| Contains | column: a Column | value: a Value  | caseSensitive: boolean  |
+| EndsWith | column: a Column | value: a Value  | caseSensitive: boolean  |
+| StartsWith | column: a Column | value: a Value  | caseSensitive: boolean  |
+| In | column: a Column | values: a list of Values  |  |
+| Not | column: a Column | values: a list of Values  |  |
+
 
 ### Writing
 _TBW_
