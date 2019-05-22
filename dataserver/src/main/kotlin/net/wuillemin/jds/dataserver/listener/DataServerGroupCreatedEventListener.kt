@@ -19,7 +19,8 @@ import org.springframework.stereotype.Component
 class DataServerGroupCreatedEventListener(
     private val groupInitializer: GroupInitializer,
     private val groupService: GroupService,
-    private val logger: Logger) : ApplicationListener<GroupCreatedEvent> {
+    private val logger: Logger
+) : ApplicationListener<GroupCreatedEvent> {
 
     /**
      * Process the event

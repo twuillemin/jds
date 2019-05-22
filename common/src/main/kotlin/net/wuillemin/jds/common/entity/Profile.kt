@@ -7,7 +7,8 @@ enum class Profile constructor(
     /**
      * The name of the role as used by Spring
      */
-    val springRoleName: String) {
+    val springRoleName: String
+) {
 
     /**
      * Admin user

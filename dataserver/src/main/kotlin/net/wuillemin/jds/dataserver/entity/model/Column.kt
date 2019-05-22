@@ -16,7 +16,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = ColumnAttribute::class, name = "attribute"),
-    JsonSubTypes.Type(value = ColumnLookup::class, name = "lookup"))
+    JsonSubTypes.Type(value = ColumnLookup::class, name = "lookup")
+)
 sealed class Column(
     open val name: String,
     open val dataType: DataType,
@@ -52,7 +53,7 @@ data class ColumnLookup(
     override val storageDetail: StorageDetail,
     // Specific properties
     val maximumNumberOfLookups: Int,
-    val dataSourceId: String,
+    val dataSourceId: Long,
     val keyColumnName: String,
     val valueColumnName: String
 ) : Column(name, dataType, size, storageDetail)

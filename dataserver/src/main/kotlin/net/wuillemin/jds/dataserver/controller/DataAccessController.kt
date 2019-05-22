@@ -44,7 +44,8 @@ class DataAccessController(
     private val dataAccessService: DataAccessService,
     private val dataSourceService: DataSourceService,
     private val dataProviderServer: DataProviderService,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Retrieve all the readable DataSources
@@ -54,7 +55,8 @@ class DataAccessController(
     @ApiOperation(value = "Get all the DataSources readable by the user")
     @GetMapping("readableDataSources")
     fun getReadableDataSources(
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<DataSource>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<DataSource>> {
 
         logger.debug("getReadableDataSources: ${authentication.getLoggingId()}")
 
@@ -77,9 +79,10 @@ class DataAccessController(
     @ApiOperation(value = "Get all the data from a DataSource")
     @PostMapping("{dataSourceId}/data")
     fun getData(
-        @PathVariable("dataSourceId") dataSourceId: String,
+        @PathVariable("dataSourceId") dataSourceId: Long,
         @RequestBody body: GetDataQuery,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<Map<String, Any>>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<Map<String, Any>>> {
 
         logger.debug("getData($dataSourceId,$body): ${authentication.getLoggingId()}")
 
@@ -87,7 +90,7 @@ class DataAccessController(
 
         if (authentication.authorities.none { it.toString() == "ROLE_ADMIN" }) {
             if (!dataSource.userAllowedToReadIds.contains(authentication.permission.userId)) {
-                throw DeniedPermissionException(E.controller.dataAccess.getDataDenied, authentication.getLoggingId(), dataSource.getLoggingId())
+                throw DeniedPermissionException(E.controller.dataAccess.getDataDenied, authentication.permission.userId, dataSource.getLoggingId())
             }
         }
 
@@ -95,7 +98,8 @@ class DataAccessController(
             dataAccessService.getData(
                 dataSource,
                 body.filter,
-                body.orders),
+                body.orders
+            ),
             HttpStatus.OK)
     }
 
@@ -107,8 +111,9 @@ class DataAccessController(
     @ApiOperation(value = "Get all the lookups values for a DataSource")
     @PostMapping("{dataSourceId}/lookupValues")
     fun getLookupValues(
-        @PathVariable("dataSourceId") dataSourceId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Map<String, Map<String, Any>>> {
+        @PathVariable("dataSourceId") dataSourceId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Map<String, Map<String, Any>>> {
 
         logger.debug("getLookupValues($dataSourceId): ${authentication.getLoggingId()}")
 
@@ -116,7 +121,7 @@ class DataAccessController(
 
         if (authentication.authorities.none { it.toString() == "ROLE_ADMIN" }) {
             if (!dataSource.userAllowedToReadIds.contains(authentication.permission.userId)) {
-                throw DeniedPermissionException(E.controller.dataAccess.getDataDenied, authentication.getLoggingId(), dataSource.getLoggingId())
+                throw DeniedPermissionException(E.controller.dataAccess.getDataDenied, authentication.permission.userId, dataSource.getLoggingId())
             }
         }
 
@@ -134,8 +139,9 @@ class DataAccessController(
     @ApiOperation(value = "Get all the columns of a DataSource")
     @GetMapping("{dataSourceId}/columns")
     fun getColumns(
-        @PathVariable("dataSourceId") dataSourceId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<Column>> {
+        @PathVariable("dataSourceId") dataSourceId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<Column>> {
 
         logger.debug("getColumns($dataSourceId): ${authentication.getLoggingId()}")
 
@@ -143,7 +149,7 @@ class DataAccessController(
 
         if (authentication.authorities.none { it.toString() == "ROLE_ADMIN" }) {
             if (!dataSource.userAllowedToReadIds.contains(authentication.permission.userId)) {
-                throw DeniedPermissionException(E.controller.dataAccess.getColumnsDenied, authentication.getLoggingId(), dataSource.getLoggingId())
+                throw DeniedPermissionException(E.controller.dataAccess.getColumnsDenied, authentication.permission.userId, dataSource.getLoggingId())
             }
         }
 
@@ -161,9 +167,10 @@ class DataAccessController(
     @ApiOperation(value = "Create a new entry in a DataSource")
     @PostMapping("{dataSourceId}/insert")
     fun insertData(
-        @PathVariable("dataSourceId") dataSourceId: String,
+        @PathVariable("dataSourceId") dataSourceId: Long,
         @RequestBody body: InsertDataQuery,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Int> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Int> {
 
         logger.debug("insertData($dataSourceId): ${authentication.getLoggingId()}")
 
@@ -171,7 +178,7 @@ class DataAccessController(
 
         if (authentication.authorities.none { it.toString() == "ROLE_ADMIN" }) {
             if (!dataSource.userAllowedToWriteIds.contains(authentication.permission.userId)) {
-                throw DeniedPermissionException(E.controller.dataAccess.insertDenied, authentication.getLoggingId(), dataSource.getLoggingId())
+                throw DeniedPermissionException(E.controller.dataAccess.insertDenied, authentication.permission.userId, dataSource.getLoggingId())
             }
         }
 
@@ -189,9 +196,10 @@ class DataAccessController(
     @ApiOperation(value = "Create multiple new entries in a DataSource")
     @PostMapping("{dataSourceId}/massInsert")
     fun massInsertData(
-        @PathVariable("dataSourceId") dataSourceId: String,
+        @PathVariable("dataSourceId") dataSourceId: Long,
         @RequestBody body: MassInsertDataQuery,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Int> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Int> {
 
         logger.debug("massInsertData($dataSourceId): ${authentication.getLoggingId()}")
 
@@ -199,7 +207,7 @@ class DataAccessController(
 
         if (authentication.authorities.none { it.toString() == "ROLE_ADMIN" }) {
             if (!dataSource.userAllowedToWriteIds.contains(authentication.permission.userId)) {
-                throw DeniedPermissionException(E.controller.dataAccess.massInsertDenied, authentication.getLoggingId(), dataSource.getLoggingId())
+                throw DeniedPermissionException(E.controller.dataAccess.massInsertDenied, authentication.permission.userId, dataSource.getLoggingId())
             }
         }
 
@@ -217,9 +225,10 @@ class DataAccessController(
     @ApiOperation(value = "Update existing entries in a DataSource")
     @PutMapping("{dataSourceId}/update")
     fun updateData(
-        @PathVariable("dataSourceId") dataSourceId: String,
+        @PathVariable("dataSourceId") dataSourceId: Long,
         @RequestBody body: UpdateDataQuery,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Int> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Int> {
 
         logger.debug("updateData($dataSourceId): ${authentication.getLoggingId()}")
 
@@ -227,7 +236,7 @@ class DataAccessController(
 
         if (authentication.authorities.none { it.toString() == "ROLE_ADMIN" }) {
             if (!dataSource.userAllowedToWriteIds.contains(authentication.permission.userId)) {
-                throw DeniedPermissionException(E.controller.dataAccess.updateDenied, authentication.getLoggingId(), dataSource.getLoggingId())
+                throw DeniedPermissionException(E.controller.dataAccess.updateDenied, authentication.permission.userId, dataSource.getLoggingId())
             }
         }
 
@@ -248,9 +257,10 @@ class DataAccessController(
     @ApiOperation(value = "Delete existing entries in a DataSource")
     @PutMapping("{dataSourceId}/delete")
     fun deleteData(
-        @PathVariable("dataSourceId") dataSourceId: String,
+        @PathVariable("dataSourceId") dataSourceId: Long,
         @RequestBody body: DeleteDataQuery,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Int> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Int> {
 
         logger.debug("deleteData($dataSourceId): ${authentication.getLoggingId()}")
 
@@ -258,13 +268,14 @@ class DataAccessController(
 
         if (authentication.authorities.none { it.toString() == "ROLE_ADMIN" }) {
             if (!dataSource.userAllowedToDeleteIds.contains(authentication.permission.userId)) {
-                throw DeniedPermissionException(E.controller.dataAccess.deleteDenied, authentication.getLoggingId(), dataSource.getLoggingId())
+                throw DeniedPermissionException(E.controller.dataAccess.deleteDenied, authentication.permission.userId, dataSource.getLoggingId())
             }
         }
 
         return ResponseEntity(
             dataAccessService.deleteData(dataSource, body.filter),
-            HttpStatus.OK)
+            HttpStatus.OK
+        )
     }
 }
 

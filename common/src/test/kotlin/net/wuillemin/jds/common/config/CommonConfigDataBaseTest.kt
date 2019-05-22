@@ -1,42 +1,38 @@
 package net.wuillemin.jds.common.config
 
-import com.mongodb.MongoClient
-import com.mongodb.ServerAddress
-import de.bwaldvogel.mongo.H2MongoServer
-import de.bwaldvogel.mongo.MongoServer
+import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
-import org.springframework.data.mongodb.MongoDbFactory
-import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
+import org.springframework.core.io.ClassPathResource
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.datasource.init.ScriptUtils
+import javax.sql.DataSource
 
 
-@EnableMongoRepositories(
-    basePackages = ["net.wuillemin.jds.common.repository"],
-    mongoTemplateRef = "commonMongoTemplate")
+@ComponentScan(basePackages = ["net.wuillemin.jds.common.repository"])
 @Import(CommonConfigTest::class)
 class CommonConfigDataBaseTest {
 
-    @Bean(name = ["commonMongoTemplate"])
-    fun mongoTemplate(mongoClient: MongoClient): MongoTemplate {
-        return MongoTemplate(mongoDbFactory(mongoClient))
+    @Bean(name = ["commonJdbcTemplate"])
+    internal fun commonJdbcTemplate(): JdbcTemplate {
+        return JdbcTemplate(commonDataSource())
     }
 
-    @Bean(name = ["commonMongoFactory"])
-    fun mongoDbFactory(mongoClient: MongoClient): MongoDbFactory {
-        return SimpleMongoDbFactory(mongoClient, "test")
-    }
+    @Bean(name = ["commonDatabaseJDBC"])
+    fun commonDataSource(): DataSource {
 
-    @Bean(destroyMethod = "shutdown")
-    fun mongoServer(): MongoServer {
-        val mongoServer = H2MongoServer()
-        mongoServer.bind()
-        return mongoServer
-    }
-
-    @Bean(destroyMethod = "close")
-    fun mongoClient(mongoServer: MongoServer): MongoClient {
-        return MongoClient(ServerAddress(mongoServer.localAddress))
+        return DataSourceBuilder
+            .create()
+            .url("jdbc:h2:mem:common;DB_CLOSE_DELAY=-1")
+            .username("sa")
+            .password("")
+            .driverClassName("org.h2.Driver")
+            .build()
+            .also {
+                it.connection.use { connection ->
+                    ScriptUtils.executeSqlScript(connection, ClassPathResource("/jdbc/common_create_db_test.sql"))
+                }
+            }
     }
 }

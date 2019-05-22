@@ -25,7 +25,8 @@ import java.util.*
 class TokenGenerator(
     private val permissionBuilder: PermissionBuilder,
     private val userService: UserService,
-    private val authServerProperties: AuthServerProperties) {
+    private val authServerProperties: AuthServerProperties
+) {
 
     private val refreshCache: MutableMap<UUID, RefreshCacheEntry> = HashMap()
 
@@ -42,7 +43,8 @@ class TokenGenerator(
     fun buildToken(
         userName: String,
         roles: List<String>,
-        userPermission: UserPermission): TokenResponse {
+        userPermission: UserPermission
+    ): TokenResponse {
 
         val currentDate = Instant.now()
 
@@ -152,7 +154,7 @@ class TokenGenerator(
      * @param userId The id of the user to be removed
      *
      */
-    fun logOutAllUserSessions(userId: String) {
+    fun logOutAllUserSessions(userId: Long) {
 
         val keyToBeRemoved = refreshCache.entries
             .filter { it.value.userPermission.userId == userId }
@@ -169,7 +171,7 @@ class TokenGenerator(
      *
      * @param userId The id of the user to be removed
      */
-    fun updateUserPermission(userId: String) {
+    fun updateUserPermission(userId: Long) {
 
         // Get the user
         val user = userService.getUserById(userId)
@@ -187,7 +189,7 @@ class TokenGenerator(
             refreshCache[id]
                 ?.let { currentEntry ->
                     refreshCache[id] = currentEntry.copy(
-                        userName = user.userName,
+                        userName = user.name,
                         roles = listOf(user.profile.toString()),
                         userPermission = permission)
                 }
@@ -209,7 +211,7 @@ class TokenGenerator(
         }
 
         // Will remove the old tokenId in 1 minute
-        Timer("Invalidate " + tokenId.toString())
+        Timer("Invalidate $tokenId")
             .schedule(task, 60000)
     }
 
@@ -221,5 +223,6 @@ class TokenGenerator(
         val tokenExpirationData: Instant,
         val userName: String,
         val roles: List<String>,
-        val userPermission: UserPermission)
+        val userPermission: UserPermission
+    )
 }

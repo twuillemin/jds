@@ -29,7 +29,8 @@ class DataProviderService(
     val dataProviderRepository: DataProviderRepository,
     val dataSourceService: DataSourceService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Get the list of all dataProviders.
@@ -51,7 +52,7 @@ class DataProviderService(
 
         return schema.id
             ?.let { schemaId ->
-                dataProviderRepository.findBySchemaId(schemaId)
+                dataProviderRepository.findAllBySchemaId(schemaId)
             }
             ?: throw BadParameterException(E.service.model.dataProvider.getForSchemaNotPersisted)
 
@@ -75,7 +76,7 @@ class DataProviderService(
 
         }
 
-        return dataProviderRepository.findBySchemaIdIn(schemaIds)
+        return dataProviderRepository.findAllBySchemaIdIn(schemaIds)
     }
 
     /**
@@ -85,7 +86,7 @@ class DataProviderService(
      * @return the dataProvider
      * @throws NotFoundException if the dataProvider does not exist
      */
-    fun getDataProviderById(id: String): DataProvider {
+    fun getDataProviderById(id: Long): DataProvider {
         return dataProviderRepository.findById(id).orElseThrow {
             NotFoundException(C.notFound.idClass, id, DataProvider::class)
         }

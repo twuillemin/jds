@@ -32,7 +32,8 @@ import org.springframework.web.client.RestTemplate
 @Api(tags = ["Authentication"], description = "Authenticate the users")
 class AuthenticationExternalController(
     private val authorizedClientService: OAuth2AuthorizedClientService,
-    private val authenticationService: AuthenticationService) {
+    private val authenticationService: AuthenticationService
+) {
 
     /**
      * Login a user coming with google authentication

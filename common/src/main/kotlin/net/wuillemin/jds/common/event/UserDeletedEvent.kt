@@ -7,4 +7,4 @@ import org.springframework.context.ApplicationEvent
  *
  * @param userId The object on which the event initially occurred
  */
-class UserDeletedEvent(val userId: String) : ApplicationEvent(userId)
+class UserDeletedEvent(val userId: Long) : ApplicationEvent(userId)

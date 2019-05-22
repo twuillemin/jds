@@ -47,7 +47,8 @@ class SQLDataWriter(
     /**
      * The logger
      */
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Insert new data in table
@@ -58,7 +59,8 @@ class SQLDataWriter(
      */
     fun insertData(
         dataProvider: DataProviderSQL,
-        dataToInsert: Map<String, Any>): Int {
+        dataToInsert: Map<String, Any>
+    ): Int {
 
         logger.debug("insertData: try to insert data in SQL dataProvider ${dataProvider.id}-${dataProvider.name}")
 
@@ -161,7 +163,8 @@ class SQLDataWriter(
      */
     fun massInsertData(
         dataProvider: DataProviderSQL,
-        dataToInsert: List<Map<String, Any>>): Int {
+        dataToInsert: List<Map<String, Any>>
+    ): Int {
 
         logger.debug("massInsertData: try to mass insert in SQL dataProvider ${dataProvider.getLoggingId()}")
 
@@ -302,7 +305,8 @@ class SQLDataWriter(
         dataProvider: DataProviderSQL,
         filter: Predicate,
         dataToUpdate: Map<String, Any?>,
-        connection: Connection? = null): Int {
+        connection: Connection? = null
+    ): Int {
 
         logger.debug("updateData: try to update data in SQL dataProvider ${dataProvider.id}-${dataProvider.name}")
 
@@ -439,7 +443,8 @@ class SQLDataWriter(
      */
     fun deleteData(
         dataProvider: DataProviderSQL,
-        filter: Predicate): Int {
+        filter: Predicate
+    ): Int {
 
         logger.debug("deleteData: try to delete data in SQL dataProvider ${dataProvider.id}-${dataProvider.name}")
 

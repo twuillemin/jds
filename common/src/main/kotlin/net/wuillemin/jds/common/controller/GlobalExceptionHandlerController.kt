@@ -35,7 +35,8 @@ import java.util.*
 class GlobalExceptionHandlerController(
     private val localisationService: LocalisationService,
     private val userService: UserService,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     // ============================================================
     // Standard Java Exceptions
@@ -108,7 +109,8 @@ class GlobalExceptionHandlerController(
     @ExceptionHandler(value = [BadParameterException::class])
     fun badParameterExceptionHandler(
         exception: BadParameterException,
-        locale: Locale): ResponseEntity<RestMessage> {
+        locale: Locale
+    ): ResponseEntity<RestMessage> {
 
         val message = localisationService.getMessage(exception.code, exception.args, locale)
         val origin = getOrigin(exception)
@@ -123,7 +125,8 @@ class GlobalExceptionHandlerController(
             }
             else {
                 HttpStatus.INTERNAL_SERVER_ERROR
-            })
+            }
+        )
     }
 
     /**
@@ -136,7 +139,8 @@ class GlobalExceptionHandlerController(
     @ExceptionHandler(value = [ClientException::class])
     fun clientExceptionHandler(
         exception: ClientException,
-        locale: Locale): ResponseEntity<RestMessage> {
+        locale: Locale
+    ): ResponseEntity<RestMessage> {
 
         val message = localisationService.getMessage(exception.code, exception.args, locale)
 
@@ -146,7 +150,8 @@ class GlobalExceptionHandlerController(
 
         return ResponseEntity(
             RestMessage(message),
-            HttpStatus.BAD_GATEWAY)
+            HttpStatus.BAD_GATEWAY
+        )
     }
 
     /**
@@ -159,7 +164,8 @@ class GlobalExceptionHandlerController(
     @ExceptionHandler(value = [ConstraintException::class])
     fun constraintExceptionHandler(
         exception: ConstraintException,
-        locale: Locale): ResponseEntity<RestMessage> {
+        locale: Locale
+    ): ResponseEntity<RestMessage> {
 
         val message = localisationService.getMessage(exception.code, exception.args, locale)
 
@@ -168,7 +174,8 @@ class GlobalExceptionHandlerController(
 
         return ResponseEntity(
             RestMessage(message),
-            HttpStatus.CONFLICT)
+            HttpStatus.CONFLICT
+        )
     }
 
     /**
@@ -181,7 +188,8 @@ class GlobalExceptionHandlerController(
     @ExceptionHandler(value = [CriticalConstraintException::class])
     fun criticalConstraintExceptionHandler(
         exception: CriticalConstraintException,
-        locale: Locale): ResponseEntity<RestMessage> {
+        locale: Locale
+    ): ResponseEntity<RestMessage> {
 
         val message = localisationService.getMessage(exception.code, exception.args, locale)
 
@@ -190,7 +198,8 @@ class GlobalExceptionHandlerController(
 
         return ResponseEntity(
             RestMessage(message),
-            HttpStatus.CONFLICT)
+            HttpStatus.CONFLICT
+        )
     }
 
     /**
@@ -203,7 +212,8 @@ class GlobalExceptionHandlerController(
     @ExceptionHandler(value = [DeniedPermissionException::class])
     fun deniedPermissionExceptionHandler(
         exception: DeniedPermissionException,
-        locale: Locale): ResponseEntity<RestMessage> {
+        locale: Locale
+    ): ResponseEntity<RestMessage> {
 
         val message = localisationService.getMessage(exception.code, exception.args, locale)
         val user = try {
@@ -211,7 +221,7 @@ class GlobalExceptionHandlerController(
         }
         catch (e: Exception) {
             logger.error("deniedPermissionExceptionHandler: a DeniedPermissionException was received with a non valid userId: '${exception.userId}'")
-            User(null, "ERROR", "", "", "", true, Profile.USER, emptySet())
+            User(null, "ERROR", "", "", "", true, Profile.USER)
         }
 
         // Give a warning because it may be a bad actor
@@ -219,7 +229,8 @@ class GlobalExceptionHandlerController(
 
         return ResponseEntity(
             RestMessage(localisationService.getMessage(exception.code, exception.args, locale)),
-            HttpStatus.FORBIDDEN)
+            HttpStatus.FORBIDDEN
+        )
     }
 
     /**
@@ -232,7 +243,8 @@ class GlobalExceptionHandlerController(
     @ExceptionHandler(value = [AuthenticationRejectedException::class])
     fun authenticationRejectedExceptionHandler(
         exception: AuthenticationRejectedException,
-        locale: Locale): ResponseEntity<RestMessage> {
+        locale: Locale
+    ): ResponseEntity<RestMessage> {
 
         val message = localisationService.getMessage(exception.code, exception.args, locale)
 
@@ -241,7 +253,8 @@ class GlobalExceptionHandlerController(
 
         return ResponseEntity(
             RestMessage(message),
-            HttpStatus.FORBIDDEN)
+            HttpStatus.FORBIDDEN
+        )
     }
 
     /**
@@ -254,7 +267,8 @@ class GlobalExceptionHandlerController(
     @ExceptionHandler(value = [NotFoundException::class])
     fun notFoundExceptionHandler(
         exception: NotFoundException,
-        locale: Locale): ResponseEntity<RestMessage> {
+        locale: Locale
+    ): ResponseEntity<RestMessage> {
 
         val message = localisationService.getMessage(exception.code, exception.args, locale)
 
@@ -263,7 +277,8 @@ class GlobalExceptionHandlerController(
 
         return ResponseEntity(
             RestMessage(message),
-            HttpStatus.NOT_FOUND)
+            HttpStatus.NOT_FOUND
+        )
     }
 
     /**

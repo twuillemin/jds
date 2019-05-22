@@ -7,4 +7,4 @@ import org.springframework.context.ApplicationEvent
  *
  * @param dataProviderId The object on which the event initially occurred
  */
-class DataProviderCreatedEvent(val dataProviderId: String) : ApplicationEvent(dataProviderId)
+class DataProviderCreatedEvent(val dataProviderId: Long) : ApplicationEvent(dataProviderId)

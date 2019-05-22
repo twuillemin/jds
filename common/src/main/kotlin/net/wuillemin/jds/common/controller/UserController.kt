@@ -33,7 +33,8 @@ import springfox.documentation.annotations.ApiIgnore
 @Secured(value = ["ROLE_USER", "ROLE_ADMIN"])
 class UserController(
     private val userService: UserService,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Return all the users of the application
@@ -41,9 +42,10 @@ class UserController(
      * @param authentication The authentication of the requester
      */
     @ApiOperation("Get all the users of the application")
-    @GetMapping()
+    @GetMapping
     fun getUsers(
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<User>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<User>> {
 
         logger.debug("getUsers: ${authentication.getLoggingId()}")
 
@@ -67,8 +69,9 @@ class UserController(
     @ApiOperation("Get a single user by its id")
     @GetMapping("{id}")
     fun getUserById(
-        @PathVariable("id") userId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<User> {
+        @PathVariable("id") userId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<User> {
 
         logger.debug("getById: ${authentication.getLoggingId()}")
 
@@ -94,9 +97,10 @@ class UserController(
     @ApiOperation("Update an existing user")
     @PutMapping("{id}")
     fun updateUser(
-        @PathVariable("id") userId: String,
+        @PathVariable("id") userId: Long,
         @RequestBody user: User,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<User> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<User> {
 
         logger.debug("updateUser: ${authentication.getLoggingId()}")
 
@@ -130,8 +134,9 @@ class UserController(
     @ApiOperation("Delete an existing user")
     @DeleteMapping("{id}")
     fun deleteUser(
-        @PathVariable("id") userId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
+        @PathVariable("id") userId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Void> {
 
         logger.debug("deleteUser: ${authentication.getLoggingId()}")
 

@@ -28,7 +28,8 @@ class ModelService(
     private val sqlModelReader: SQLModelReader,
     private val sqlModelWriter: SQLModelWriter,
     private val sqlQueryImporter: SQLQueryImporter,
-    private val dataProviderService: DataProviderService) {
+    private val dataProviderService: DataProviderService
+) {
 
     /**
      * Get the table in a schema
@@ -83,8 +84,8 @@ class ModelService(
     fun createTable(
         schema: Schema,
         tableName: String,
-        columns: List<ColumnAttribute>) {
-
+        columns: List<ColumnAttribute>
+    ) {
         return when (schema) {
             is SchemaSQL    -> sqlModelWriter.createTable(schema, tableName, columns)
             is SchemaGSheet -> throw BadParameterException(E.service.model.preview.schemaNotSupported, schema::class)
@@ -101,7 +102,8 @@ class ModelService(
     fun createDataProviderFromSQL(
         schema: Schema,
         name: String,
-        query: String): DataProvider {
+        query: String
+    ): DataProvider {
 
         val schemaSQL = schema as? SchemaSQL
             ?: throw BadParameterException(E.service.import.dataProviderNotSupported, schema::class)

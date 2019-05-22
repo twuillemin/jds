@@ -9,4 +9,5 @@ data class ExceptionCode(
     /**
      * The code value that must correspond to a localizable string in the .properties file
      */
-    val code: String)
+    val code: String
+)

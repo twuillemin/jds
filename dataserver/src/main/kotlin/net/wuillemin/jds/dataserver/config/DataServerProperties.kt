@@ -1,7 +1,5 @@
 package net.wuillemin.jds.dataserver.config
 
-import org.springframework.boot.autoconfigure.mongo.MongoProperties
-
 /**
  * Main class for the configuration of the data server
  *
@@ -9,8 +7,9 @@ import org.springframework.boot.autoconfigure.mongo.MongoProperties
  * @param storageDatabase The database for storage
  */
 data class DataServerProperties(
-    val configurationDatabase: MongoProperties,
-    val storageDatabase: List<SQLDatabaseProperties>) {
+    val configurationDatabase: SQLDatabaseProperties,
+    val storageDatabase: List<SQLDatabaseProperties>
+) {
 
 
     /**
@@ -19,10 +18,12 @@ data class DataServerProperties(
      * @param jdbcConnectionUrl The JDBC connection string
      * @param user The user
      * @param password The password
+     * @param driverClassName The name of the driver
      */
     data class SQLDatabaseProperties(
         val jdbcConnectionUrl: String,
         val user: String?,
-        val password: String?
+        val password: String?,
+        val driverClassName: String
     )
 }

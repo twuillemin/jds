@@ -10,8 +10,9 @@ package net.wuillemin.jds.common.exception
  */
 class DeniedPermissionException(
     val code: ExceptionCode,
-    val userId: String,
-    vararg val args: Any?) : RuntimeException() {
+    val userId: Long,
+    vararg val args: Any?
+) : RuntimeException() {
 
     companion object {
         private const val serialVersionUID = 1L

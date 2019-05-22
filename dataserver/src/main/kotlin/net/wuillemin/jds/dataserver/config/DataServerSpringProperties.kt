@@ -1,7 +1,6 @@
 package net.wuillemin.jds.dataserver.config
 
 import org.springframework.beans.factory.BeanCreationException
-import org.springframework.boot.autoconfigure.mongo.MongoProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,33 +30,22 @@ class DataServerSpringProperties {
     fun buildDataServerProperties(): DataServerProperties {
 
         // Valid the base attributes
-        val storage = storageDatabases.map { database ->
+        val configuration = checkAndConvertDatabaseDefinition(configurationDatabase)
 
-            database.jdbcConnectionUrl
-                ?.let { jdbcConnectionUrl ->
-                    if (jdbcConnectionUrl.isBlank()) {
-                        throw BeanCreationException("The property 'jdbcConnectionUrl' must not be blank")
-                    }
-                    DataServerProperties.SQLDatabaseProperties(
-                        jdbcConnectionUrl,
-                        database.user,
-                        database.password
-                    )
-                }
-                ?: throw BeanCreationException("The property 'jdbcConnectionUrl' must not be null")
-        }
+        // Valid the base attributes
+        val storage = storageDatabases.map { checkAndConvertDatabaseDefinition(it) }
 
         if (storage.isEmpty()) {
             throw BeanCreationException("There must be at least a database defined in 'storageDatabases'")
         }
 
-        return DataServerProperties(configurationDatabase, storage)
+        return DataServerProperties(configuration, storage)
     }
 
     /**
      * The definition of the database for storing the configuration of the model
      */
-    var configurationDatabase: MongoProperties = MongoProperties()
+    var configurationDatabase: SQLDatabaseProperties? = null
 
     /**
      * The definition of the database for storing the configuration of the model
@@ -72,7 +60,7 @@ class DataServerSpringProperties {
         /**
          * The JDBC connection string
          */
-        var jdbcConnectionUrl: String? = null
+        var url: String? = null
 
         /**
          * The user
@@ -83,5 +71,30 @@ class DataServerSpringProperties {
          * The password
          */
         var password: String? = null
+
+        /**
+         * The driver
+         */
+        var driverClassName: String? = null
+    }
+
+    private fun checkAndConvertDatabaseDefinition(db: SQLDatabaseProperties?): DataServerProperties.SQLDatabaseProperties {
+
+        db ?: throw BeanCreationException("The property 'commonDatabase' of the database must not be blank")
+
+        val url = db.url
+        if (url.isNullOrBlank())
+            throw BeanCreationException("The property 'url' of the database must not be blank")
+
+        val driverClassName = db.driverClassName
+        if (driverClassName.isNullOrBlank())
+            throw BeanCreationException("The property 'driverClassName' of the database must not be blank")
+
+        return DataServerProperties.SQLDatabaseProperties(
+            url,
+            db.user,
+            db.password,
+            driverClassName
+        )
     }
 }

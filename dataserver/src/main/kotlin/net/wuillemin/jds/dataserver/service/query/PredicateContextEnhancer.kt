@@ -115,7 +115,8 @@ class PredicateContextEnhancer(previousContext: Context) : QueryVisitor {
      */
     private fun processLeftRightPredicate(
         right: RequestElement,
-        left: RequestElement) {
+        left: RequestElement
+    ) {
 
         internalContext[left]
             // If there is something on the left of the equation
@@ -153,7 +154,8 @@ class PredicateContextEnhancer(previousContext: Context) : QueryVisitor {
      */
     private fun processColumnValuePredicate(
         column: ColumnName,
-        value: Value) {
+        value: Value
+    ) {
 
         if (internalContext[column] == null || internalContext[column] != DataType.STRING) {
             throw BadParameterException(E.service.query.likeColumnNotString)

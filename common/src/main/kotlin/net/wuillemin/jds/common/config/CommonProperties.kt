@@ -1,7 +1,6 @@
 package net.wuillemin.jds.common.config
 
 import net.wuillemin.jds.common.security.ServerReference
-import org.springframework.boot.autoconfigure.mongo.MongoProperties
 import java.net.URI
 import java.security.PublicKey
 
@@ -13,9 +12,10 @@ import java.security.PublicKey
  * @param client Configuration of the network when acting as a client
  */
 data class CommonProperties(
-    val database: MongoProperties,
+    val database: SQLDatabaseProperties,
     val server: Server,
-    val client: Client) {
+    val client: Client
+) {
 
     /**
      * Configuration of the network when acting as a server
@@ -74,5 +74,20 @@ data class CommonProperties(
      */
     data class NoAuthentication(
         val targets: List<ServerReference>
+    )
+
+    /**
+     * The configuration for a SQL database
+     *
+     * @param jdbcConnectionUrl The JDBC connection string
+     * @param user The user
+     * @param password The password
+     * @param driverClassName The driver
+     */
+    data class SQLDatabaseProperties(
+        val jdbcConnectionUrl: String,
+        val user: String?,
+        val password: String?,
+        val driverClassName: String
     )
 }

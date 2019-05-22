@@ -14,11 +14,12 @@ import net.wuillemin.jds.common.entity.Loggable
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = SchemaSQL::class, name = "SQL"),
-    JsonSubTypes.Type(value = SchemaGSheet::class, name = "GSheet"))
+    JsonSubTypes.Type(value = SchemaGSheet::class, name = "GSheet")
+)
 sealed class Schema(
-    open val id: String?,
+    open val id: Long?,
     open val name: String,
-    open val serverId: String
+    open val serverId: Long
 ) : Loggable {
 
     override fun getLoggingId(): String {
@@ -35,9 +36,9 @@ sealed class Schema(
  */
 data class SchemaSQL(
     // Inherited properties
-    override val id: String?,
+    override val id: Long?,
     override val name: String,
-    override val serverId: String,
+    override val serverId: Long,
     // Specific properties
     val roleName: String?
 ) : Schema(id, name, serverId)
@@ -48,7 +49,7 @@ data class SchemaSQL(
  */
 data class SchemaGSheet(
     // Inherited properties
-    override val id: String?,
+    override val id: Long?,
     override val name: String,
-    override val serverId: String
+    override val serverId: Long
 ) : Schema(id, name, serverId)

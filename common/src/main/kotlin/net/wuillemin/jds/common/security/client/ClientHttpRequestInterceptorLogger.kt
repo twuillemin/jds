@@ -29,7 +29,8 @@ class ClientHttpRequestInterceptorLogger(private val logger: Logger) : ClientHtt
     override fun intercept(
         request: HttpRequest,
         body: ByteArray,
-        execution: ClientHttpRequestExecution): ClientHttpResponse {
+        execution: ClientHttpRequestExecution
+    ): ClientHttpResponse {
 
         logRequestDetails(request)
         return execution.execute(request, body)

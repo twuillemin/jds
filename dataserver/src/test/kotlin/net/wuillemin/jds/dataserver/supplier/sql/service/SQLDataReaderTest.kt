@@ -35,6 +35,12 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val SERVER_ID = 100L
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_ID = 300L
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SQLDataReaderTest {
 
@@ -53,18 +59,19 @@ class SQLDataReaderTest {
     private val sqlDataReader = SQLDataReader(schemaService, jdbcHelper, sqlHelper, sqlConnectionCache, sqlPredicateConverter, sqlOrderConverter, objectMapper, logger)
 
     private val serverSQL = ServerSQL(
-        "serverId",
+        SERVER_ID,
         "testServer",
-        "groupId",
+        GROUP_ID,
         true,
         "jdbc:h2:mem:",
         "sa",
-        null)
+        null,
+        "org.h2.Driver")
 
     private val schemaSQL = SchemaSQL(
-        "schemaId",
+        SCHEMA_ID,
         "PUBLIC",
-        "groupId",
+        GROUP_ID,
         null)
 
     @BeforeAll
@@ -243,9 +250,9 @@ class SQLDataReaderTest {
 
     private fun getBasicDataProvider(): DataProviderSQL {
         return DataProviderSQL(
-            "dataProviderId",
-            "schemaId",
+            DATA_PROVIDER_ID,
             "data provider name",
+            SCHEMA_ID,
             listOf(
                 ColumnAttribute(
                     "id",

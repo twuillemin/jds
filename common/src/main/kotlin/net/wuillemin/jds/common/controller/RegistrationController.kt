@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.RestController
 @Api(tags = ["Registration API"], description = "Public facing API - No login required")
 class RegistrationController(
     private val userService: UserService,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Create a new user
@@ -31,9 +32,10 @@ class RegistrationController(
      * @param user The user to create. If an id is given in the object, an exception will be thrown
      */
     @ApiOperation("Create a new user")
-    @PostMapping()
+    @PostMapping
     fun createUser(
-        @RequestBody user: User): ResponseEntity<User> {
+        @RequestBody user: User
+    ): ResponseEntity<User> {
 
         logger.info("createUser($user)")
 

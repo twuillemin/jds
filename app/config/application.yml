@@ -33,7 +33,7 @@ logging:
     net:
       wuillemin:
         jds:
-            auth: DEBUG
+          auth: DEBUG
 
 # #####################################################
 # GENERAL SERVER PROPERTIES
@@ -106,9 +106,10 @@ jds:
     # two objects provided by the common library
     # ----------------------------------------------------------------
     database:
-      host: localhost
-      port: 27017
-      database: common
+      url: jdbc:postgresql://localhost/jds_config
+      user: jds
+      password: "jds_password"
+      driverClassName: "org.postgresql.Driver"
 
   # #####################################################
   # AUTHENTICATION SERVER
@@ -131,13 +132,16 @@ jds:
     # ----------------------------------------------------------------
 
     localUsers:
-      - userName: admin
+      - userId: -2
+        userName: admin
         password: admin_password
         profile: ADMIN
-      - userName: user
+      - userId: -3
+        userName: user
         password: user_password
         profile: USER
-      - userName: service
+      - userId: -4
+        userName: service
         password: service_password
         profile: SERVICE
 
@@ -147,19 +151,21 @@ jds:
   dataserver:
     # ----------------------------------------------------------------
     # The database storing the information about the data models
-    # The database is supposed to be a Mongo Database
+    # The database is supposed to be a SQL database
     # ----------------------------------------------------------------
     configurationDatabase:
-      host: localhost
-      port: 27017
-      database: dataserver
+      url: jdbc:postgresql://localhost/jds_config
+      user: jds
+      password: "jds_password"
+      driverClassName: "org.postgresql.Driver"
 
     # ----------------------------------------------------------------
     # The list of databases for storing user data. At least one must
-    # be present
+    # be present in the list
     # The database is supposed to be a PostgresDatabase
     # ----------------------------------------------------------------
     storageDatabases:
-      - jdbcConnectionUrl: jdbc:postgresql://localhost/jds
+      - url: jdbc:postgresql://localhost/jds_data
         user: jds
         password: "jds_password"
+        driverClassName: "org.postgresql.Driver"

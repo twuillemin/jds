@@ -7,4 +7,4 @@ import org.springframework.context.ApplicationEvent
  *
  * @param groupId The object on which the event initially occurred
  */
-class GroupUpdatedEvent(val groupId: String) : ApplicationEvent(groupId)
+class GroupUpdatedEvent(val groupId: Long) : ApplicationEvent(groupId)

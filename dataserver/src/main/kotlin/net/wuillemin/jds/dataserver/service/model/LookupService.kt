@@ -34,7 +34,8 @@ class LookupService(
     private val dataProviderService: DataProviderService,
     private val dataAccessService: DataAccessService,
     private val localisationService: LocalisationService,
-    private val objectMapper: ObjectMapper) {
+    private val objectMapper: ObjectMapper
+) {
 
     /**
      * Promote a column to as a lookup column. The process starts with basic tests (existence of the columns, etc.) that will
@@ -51,7 +52,8 @@ class LookupService(
     fun promoteColumnToLookup(
         dataProvider: DataProvider,
         query: PromoteColumnToLookupQuery,
-        locale: Locale): DataProvider {
+        locale: Locale
+    ): DataProvider {
 
         // Retrieve the needed objects (or die trying)
         val targetDataSource = dataSourceService.getDataSourceById(query.dataSourceId)
@@ -113,9 +115,15 @@ class LookupService(
                             .filter { it.isNotBlank() }
                             .toList()
 
-                        // Get the primary keys
+                        // Get the values primary keys. As these are the values of the primary
+                        // they will always be present, but the as data are received as a map,
+                        // they could be null, so use getOrElse with an empty string
                         val lineId = primaryKeys
-                            .map { primaryKeys[0] to line[primaryKeys[0]]!! }
+                            .map { primaryKey ->
+                                val value = line[primaryKey]
+                                    ?: throw ConstraintException(E.service.model.lookup.primaryKeyValueIsNull, dataProvider, primaryKey)
+                                primaryKey to value
+                            }
                             .toList()
 
                         // Convert to new values
@@ -171,7 +179,7 @@ class LookupService(
             }
 
         // If there are errors, throw a constraint exception
-        if (!errors.isEmpty()) {
+        if (errors.isNotEmpty()) {
             throw ConstraintException(E.service.model.lookup.failedToPromoteLookup, query.columnName, errors.joinToString("\n"))
         }
 
@@ -202,7 +210,6 @@ class LookupService(
                     query.keyColumnName,
                     query.valueColumnName)
             }
-
         }
 
         // Save the new data provider

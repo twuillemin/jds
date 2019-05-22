@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component
 @Component
 class AuthUserDeletedEventListener(
     private val tokenGenerator: TokenGenerator,
-    private val logger: Logger) : ApplicationListener<UserDeletedEvent> {
+    private val logger: Logger
+) : ApplicationListener<UserDeletedEvent> {
 
     /**
      * Process the event

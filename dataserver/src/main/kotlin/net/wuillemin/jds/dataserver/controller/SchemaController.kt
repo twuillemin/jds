@@ -50,7 +50,8 @@ class SchemaController(
     val dataProviderService: DataProviderService,
     val groupService: GroupService,
     val modelService: ModelService,
-    val logger: Logger) {
+    val logger: Logger
+) {
 
     /**
      * Return all the schemas
@@ -60,7 +61,8 @@ class SchemaController(
     @ApiOperation("Return all the schemas.")
     @GetMapping
     fun getAllSchemas(
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<Schema>> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<Schema>> {
 
         logger.debug("getAllSchemas: ${authentication.getLoggingId()}")
 
@@ -86,8 +88,9 @@ class SchemaController(
     @ApiOperation("Get a Schema by its id.")
     @GetMapping("{id}")
     fun getSchemaById(
-        @PathVariable("id") schemaId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Schema> {
+        @PathVariable("id") schemaId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Schema> {
 
         logger.debug("getSchemaById($schemaId): ${authentication.getLoggingId()}")
 
@@ -112,10 +115,11 @@ class SchemaController(
      * @param authentication The authentication of the requester
      */
     @ApiOperation("Create a new Schema.")
-    @PostMapping()
+    @PostMapping
     fun createSchema(
         @RequestBody schema: Schema,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Schema> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Schema> {
 
         logger.debug("createSchema($schema): ${authentication.getLoggingId()}")
 
@@ -146,9 +150,10 @@ class SchemaController(
     @ApiOperation("Update an existing schema.")
     @PutMapping("{id}")
     fun updateSchema(
-        @PathVariable("id") schemaId: String,
+        @PathVariable("id") schemaId: Long,
         @RequestBody schema: Schema,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Schema> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Schema> {
 
         logger.debug("updateSchema($schemaId,$schema): ${authentication.getLoggingId()}")
 
@@ -183,8 +188,9 @@ class SchemaController(
     @ApiOperation("Delete a Schema.")
     @DeleteMapping("{id}")
     fun deleteSchema(
-        @PathVariable("id") schemaId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Void> {
+        @PathVariable("id") schemaId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Void> {
 
         logger.debug("deleteSchema($schemaId): ${authentication.getLoggingId()}")
 
@@ -217,8 +223,9 @@ class SchemaController(
     @ApiOperation("Get all the data providers for a schema.")
     @GetMapping("{id}/dataProviders")
     fun getDataProviders(
-        @PathVariable("id") schemaId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<DataProvider>> {
+        @PathVariable("id") schemaId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<DataProvider>> {
 
         logger.debug("getDataProviders($schemaId): ${authentication.getLoggingId()}")
 
@@ -248,8 +255,9 @@ class SchemaController(
     @ApiOperation("Get all the tables existing in a schema.")
     @GetMapping("{id}/tables")
     fun getSchemaTables(
-        @PathVariable("id") schemaId: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<List<String>> {
+        @PathVariable("id") schemaId: Long,
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<List<String>> {
 
         logger.debug("getSchemaTables($schemaId): ${authentication.getLoggingId()}")
 
@@ -272,9 +280,10 @@ class SchemaController(
     @ApiOperation("Get the preview of table (columns and data).")
     @GetMapping("{id}/tables/{tableName}/preview")
     fun getSchemaPreviewTable(
-        @PathVariable("id") schemaId: String,
+        @PathVariable("id") schemaId: Long,
         @PathVariable("tableName") tableName: String,
-        @ApiIgnore authentication: AuthenticationToken): ResponseEntity<Preview> {
+        @ApiIgnore authentication: AuthenticationToken
+    ): ResponseEntity<Preview> {
 
         logger.debug("getPreviewTable($schemaId, $tableName): ${authentication.getLoggingId()}")
 

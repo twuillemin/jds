@@ -16,14 +16,16 @@ import java.util.*
  */
 @Service
 class ClientHttpRequestAuthenticatorBasic(
-    private val commonProperties: CommonProperties) : ClientHttpRequestAuthenticator {
+    private val commonProperties: CommonProperties
+) : ClientHttpRequestAuthenticator {
 
     private val authenticationByServer = buildAuthenticatorMap()
 
     override fun addAuthentication(
         request: HttpRequest,
         body: ByteArray,
-        execution: ClientHttpRequestExecution) {
+        execution: ClientHttpRequestExecution
+    ) {
 
         // Get the id of the server
         val serverId = request.uri.let { ServerReference(it.host, it.port) }

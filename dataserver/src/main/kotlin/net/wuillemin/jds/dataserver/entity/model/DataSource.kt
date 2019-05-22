@@ -12,15 +12,15 @@ import net.wuillemin.jds.common.entity.Loggable
  * @param userAllowedToWriteIds The list of ids of the users who can write objects of the DataSource. Users allowed to
  * write are automatically added the the users allowed to read if not present
  * @param userAllowedToDeleteIds The list of ids of the users who can delete objects of the DataSource. Users allowed
- * to write are automatically added the the users allowed to read and write if not present
-*/
+ * to delete are automatically added the the users allowed to read and write if not present
+ */
 data class DataSource(
-    val id: String?,
-    val dataProviderId: String,
+    val id: Long?,
     val name: String,
-    val userAllowedToReadIds: Set<String>,
-    val userAllowedToWriteIds: Set<String>,
-    val userAllowedToDeleteIds: Set<String>
+    val dataProviderId: Long,
+    val userAllowedToReadIds: Set<Long>,
+    val userAllowedToWriteIds: Set<Long>,
+    val userAllowedToDeleteIds: Set<Long>
 ) : Loggable {
 
     override fun getLoggingId(): String {

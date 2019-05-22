@@ -35,8 +35,15 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.OffsetDateTime
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val SERVER_ID = 100L
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_ID = 300L
+private const val DATA_SOURCE_ID = 400L
 
 class CSVImporterTest {
+
     // -------------------------------------------------------------
     // Definition of the mocks
     // -------------------------------------------------------------
@@ -70,18 +77,19 @@ class CSVImporterTest {
     // Definition of objects (for mocked services)
     // -------------------------------------------------------------
     private val serverSQL = ServerSQL(
-        "serverId",
+        SERVER_ID,
         "testServer",
-        "groupId",
+        GROUP_ID,
         true,
         "jdbc:h2:mem:",
         "sa",
-        null)
+        null,
+        "org.h2.Driver")
 
     private val schemaSQL = SchemaSQL(
-        "schemaId",
+        SCHEMA_ID,
         "PUBLIC",
-        "groupId",
+        GROUP_ID,
         null)
 
     // -------------------------------------------------------------
@@ -100,16 +108,16 @@ class CSVImporterTest {
         // Fake save of the DataProvider
         whenever(dataProviderService.addDataProvider(any())).then { invocation ->
             val src = invocation.getArgument(0) as DataProviderSQL
-            val newDataProvider = src.copy(id = "dataProviderId")
-            whenever(dataProviderService.getDataProviderById(eq("dataProviderId"))).thenReturn(newDataProvider)
+            val newDataProvider = src.copy(id = DATA_PROVIDER_ID)
+            whenever(dataProviderService.getDataProviderById(eq(DATA_PROVIDER_ID))).thenReturn(newDataProvider)
             newDataProvider
         }
 
         // Fake save of the DataSource
         whenever(dataSourceService.addDataSource(any())).then { invocation ->
             val src = invocation.getArgument(0) as DataSource
-            val newDataSource = src.copy(id = "dataSourceId")
-            whenever(dataSourceService.getDataSourceById(eq("dataSourceId"))).thenReturn(newDataSource)
+            val newDataSource = src.copy(id = DATA_SOURCE_ID)
+            whenever(dataSourceService.getDataSourceById(eq(DATA_SOURCE_ID))).thenReturn(newDataSource)
             newDataSource
         }
 

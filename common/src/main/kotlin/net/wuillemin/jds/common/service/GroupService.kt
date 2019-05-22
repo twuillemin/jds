@@ -32,7 +32,8 @@ class GroupService(
     private val userRepository: UserRepository,
     private val groupRepository: GroupRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Get the list of all groups.
@@ -49,8 +50,18 @@ class GroupService(
      * @param ids The id of the groups to find and load
      * @return the groups
      */
-    fun findGroupByIds(ids: Iterable<String>): List<Group> {
+    fun findGroupByIds(ids: Iterable<Long>): List<Group> {
         return groupRepository.findAllById(ids).toList()
+    }
+
+    /**
+     * Try to load the groups for the given user id. If the user id does not exist, no exception is thrown
+     *
+     * @param userId The id of the user for which to load the groups
+     * @return the groups
+     */
+    fun findGroupByUserId(userId: Long): List<Group> {
+        return groupRepository.findAllByUserId(userId).toList()
     }
 
     /**
@@ -59,7 +70,7 @@ class GroupService(
      * @param id The id of the group to retrieve
      * @return the group
      */
-    fun getGroupById(id: String): Group {
+    fun getGroupById(id: Long): Group {
         return groupRepository.findById(id).orElseThrow {
             NotFoundException(C.notFound.idClass, id, Group::class)
         }
@@ -74,7 +85,7 @@ class GroupService(
      */
     fun getGroupByName(name: String): Group {
         // Get the group with the wanted groupName
-        val groups = groupRepository.findByName(name)
+        val groups = groupRepository.findAllByName(name)
         return when (groups.size) {
             0    -> {
                 throw NotFoundException(C.notFound.valueAttributeClass, name, "name", Group::class)
@@ -96,7 +107,7 @@ class GroupService(
      */
     fun addGroup(group: Group, user: User): Group {
 
-        group.id
+        return group.id
             ?.let {
                 throw BadParameterException(E.service.group.createAlreadyPersisted)
             }
@@ -104,7 +115,7 @@ class GroupService(
                 user.id
                     ?.let { userId ->
 
-                        if (groupRepository.findByName(group.name).isNotEmpty()) {
+                        if (groupRepository.findAllByName(group.name).isNotEmpty()) {
                             throw ConstraintException(E.service.group.createNameAlreadyExists)
                         }
 
@@ -112,19 +123,14 @@ class GroupService(
                         val groupToCreate = group.copy(
                             administratorIds = group.administratorIds + userId,
                             userIds = group.userIds + group.administratorIds + userId)
-                        val groupAdded = groupRepository.save(groupToCreate)
 
-                        // Update the user
-                        val userUpdated = user.copy(participatingGroupIds = user.participatingGroupIds + groupAdded.id!!)
-                        userRepository.save(userUpdated)
-                        applicationEventPublisher.publishEvent(UserUpdatedEvent(userId))
-
-                        // Publish the information
-                        applicationEventPublisher.publishEvent(GroupCreatedEvent(groupAdded.id))
-
-                        logger.info("addGroup: The group ${groupAdded.getLoggingId()} was created")
-
-                        return groupAdded
+                        groupRepository
+                            .save(groupToCreate)
+                            .also { groupAdded ->
+                                // Publish the information
+                                applicationEventPublisher.publishEvent(GroupCreatedEvent(groupAdded.id!!))
+                                logger.info("addGroup: The group ${groupAdded.getLoggingId()} was created")
+                            }
                     }
                     ?: throw BadParameterException(E.service.group.createCreatorNotPersisted)
             }
@@ -151,27 +157,10 @@ class GroupService(
                     }
                     .toSet() + group.administratorIds
 
-                // Update the group adding the new users (and ensure that administrators are not removed in the process)
+                // Update the group
                 groupRepository
                     .save(group.copy(userIds = newUserIds))
                     .also {
-
-                        // Update the removed users in the group
-                        val userRemovedIds = group.userIds.subtract(newUserIds)
-                        userRepository.findAllById(userRemovedIds).forEach { user ->
-                            userRepository.save(user.copy(participatingGroupIds = user.participatingGroupIds - groupId))
-                        }
-
-                        // Update the added users in the group
-                        val userAddedIds = newUserIds.subtract(group.userIds)
-                        userRepository.findAllById(userAddedIds).forEach { user ->
-                            userRepository.save(user.copy(participatingGroupIds = user.participatingGroupIds + groupId))
-                        }
-
-                        (userRemovedIds + userAddedIds).forEach { userUpdatedId ->
-                            applicationEventPublisher.publishEvent(UserUpdatedEvent(userUpdatedId))
-                        }
-
                         // Publish the information
                         applicationEventPublisher.publishEvent(GroupUpdatedEvent(groupId))
                     }
@@ -190,7 +179,7 @@ class GroupService(
 
         return group.id
             ?.let { groupId ->
-                // Ensure a clean list of user ids
+                // Ensure a clean list of admin ids
                 val newAdministratorIds = administrators
                     .map { (id) ->
                         id
@@ -205,31 +194,14 @@ class GroupService(
                     throw ConstraintException(E.service.group.setAdministratorsNoAdministratorLeft)
                 }
 
+                val newUserIds = group.userIds + newAdministratorIds
+
                 groupRepository
                     // Update the group
-                    .save(
-                        group.copy(
-                            administratorIds = newAdministratorIds,
-                            userIds = group.userIds + newAdministratorIds))
-                    // Update the users and inform
+                    .save(group.copy(
+                        administratorIds = newAdministratorIds,
+                        userIds = newUserIds))
                     .also {
-                        // Update the removed administrators
-                        val administratorRemovedIds = group.administratorIds.subtract(newAdministratorIds)
-                        userRepository.findAllById(administratorRemovedIds).forEach { user ->
-                            userRepository.save(user.copy(participatingGroupIds = user.participatingGroupIds - groupId))
-                        }
-
-                        // Update the added administrators
-                        val administratorAddedIds = newAdministratorIds.subtract(group.administratorIds)
-                        userRepository.findAllById(administratorAddedIds).forEach { user ->
-                            userRepository.save(user.copy(participatingGroupIds = user.participatingGroupIds + groupId))
-                        }
-
-                        // Send the message for the users
-                        (administratorRemovedIds + administratorAddedIds).forEach { userUpdatedId ->
-                            applicationEventPublisher.publishEvent(UserUpdatedEvent(userUpdatedId))
-                        }
-
                         // Send the message for updating
                         applicationEventPublisher.publishEvent(GroupUpdatedEvent(groupId))
                     }
@@ -262,15 +234,10 @@ class GroupService(
 
                         // Clean the group, save it and update the application rights
                         groupRepository
-                            .save(
-                                group.copy(
-                                    administratorIds = newAdministratorIds,
-                                    userIds = newUserIds))
+                            .save(group.copy(
+                                administratorIds = newAdministratorIds,
+                                userIds = newUserIds))
                             .also {
-                                // Update the user
-                                userRepository.save(user.copy(participatingGroupIds = user.participatingGroupIds.minus(groupId)))
-                                // Send the message for updating
-                                applicationEventPublisher.publishEvent(UserUpdatedEvent(userId))
                                 applicationEventPublisher.publishEvent(GroupUpdatedEvent(groupId))
                             }
                     }
@@ -292,16 +259,6 @@ class GroupService(
                 // Ensure the group is present in the database
                 groupRepository.findById(groupId).orElseThrow {
                     NotFoundException(C.notFound.idClass, groupId, Group::class)
-                }
-
-                // Remove the administrators
-                userRepository.findAllById(group.administratorIds).forEach { user ->
-                    userRepository.save(user.copy(participatingGroupIds = user.participatingGroupIds.filter { it != groupId }.toSet()))
-                }
-
-                // Remove the users
-                userRepository.findAllById(group.userIds).forEach { user ->
-                    userRepository.save(user.copy(participatingGroupIds = user.participatingGroupIds.filter { it != groupId }.toSet()))
                 }
 
                 // Delete the group

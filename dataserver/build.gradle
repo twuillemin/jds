@@ -6,7 +6,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-jdbc')
 
     // The JDBC drivers
-    compile('com.h2database:h2:1.4.197')
+    //compile('com.h2database:h2:1.4.197')
     compile('org.postgresql:postgresql:42.2.5')
 
     // The parser of SQL statement
@@ -14,4 +14,7 @@ dependencies {
 
     // The parser of CSV files
     compile('org.apache.commons:commons-csv:1.6')
+
+    // Testing H2
+    testCompile("com.h2database:h2")
 }

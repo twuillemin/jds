@@ -8,7 +8,6 @@ import net.wuillemin.jds.common.event.GroupUpdatedEvent
 import net.wuillemin.jds.common.event.UserCreatedEvent
 import net.wuillemin.jds.common.event.UserDeletedEvent
 import net.wuillemin.jds.common.event.UserUpdatedEvent
-import net.wuillemin.jds.common.exception.BadParameterException
 import net.wuillemin.jds.common.exception.ConstraintException
 import net.wuillemin.jds.common.exception.CriticalConstraintException
 import net.wuillemin.jds.common.exception.NotFoundException
@@ -28,7 +27,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [
     CommonConfigDataBaseTest::class,
-    UserService::class])
+    UserService::class,
+    GroupService::class])
 class UserServiceTest {
 
     @Autowired
@@ -46,7 +46,7 @@ class UserServiceTest {
 
         // Check found if one group
         userRepository.deleteAll()
-        userRepository.save(User("userId", "userName", "password", "firstName", "lastName", true, Profile.USER, setOf("otherGroupId")))
+        userRepository.save(User(null, "userName", "password", "firstName", "lastName", true, Profile.USER))
         val result1 = userService.getUserByUserName("userName")
         Assertions.assertNotNull(result1)
 
@@ -56,8 +56,8 @@ class UserServiceTest {
 
         // Check constraint error if multiple
         userRepository.deleteAll()
-        userRepository.save(User("userId1", "userName", "password", "firstName", "lastName", true, Profile.USER, setOf("otherGroupId")))
-        userRepository.save(User("userId2", "userName", "password", "firstName", "lastName", true, Profile.USER, setOf("otherGroupId")))
+        userRepository.save(User(null, "userName", "password", "firstName", "lastName", true, Profile.USER))
+        userRepository.save(User(null, "userName", "password", "firstName", "lastName", true, Profile.USER))
         Assertions.assertThrows(CriticalConstraintException::class.java) { userService.getUserByUserName("userName") }
     }
 
@@ -65,10 +65,10 @@ class UserServiceTest {
     fun `Create safe user should give only store safe values`() {
 
         userRepository.deleteAll()
-        val userToCreate = User(null, "userName", "password", "firstName", "lastName", false, Profile.ADMIN, emptySet())
+        val userToCreate = User(null, "userName", "password", "firstName", "lastName", false, Profile.ADMIN)
 
         // Values sent by the message
-        var propagatedUserId: String? = null
+        var propagatedUserId: Long? = null
 
         // Receive the events
         val applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME) as ApplicationEventMulticaster
@@ -86,55 +86,27 @@ class UserServiceTest {
 
         val userSaved = userRepository.findById(createdUser.id!!).get()
         Assertions.assertNotNull(userSaved)
-        Assertions.assertEquals("userName", userSaved.userName)
+        Assertions.assertEquals("userName", userSaved.name)
         Assertions.assertEquals("firstName", userSaved.firstName)
         Assertions.assertEquals("lastName", userSaved.lastName)
         Assertions.assertNotEquals("password", userSaved.password)
         Assertions.assertTrue(userSaved.enabled)
         Assertions.assertEquals(Profile.USER, userSaved.profile)
-        Assertions.assertTrue(userSaved.participatingGroupIds.isEmpty())
 
         // Check that a message was not sent
         Assertions.assertNotNull(propagatedUserId)
     }
 
     @Test
-    fun `Create a user can only be done without groups`() {
-
-        userRepository.deleteAll()
-        val userToCreate = User(null, "userName", "password", "firstName", "lastName", true, Profile.USER, setOf("groupId"))
-
-        // Values sent by the message
-        var propagatedUserId: String? = null
-
-        // Receive the events
-        val applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME) as ApplicationEventMulticaster
-        val listener = fun(event: ApplicationEvent) {
-            when (event) {
-                is UserCreatedEvent -> propagatedUserId = event.userId
-            }
-        }
-        applicationEventMulticaster.addApplicationListener(listener)
-
-        // User does not exist
-        Assertions.assertThrows(BadParameterException::class.java) { userService.addSafeUser(userToCreate) }
-
-        applicationEventMulticaster.removeApplicationListener(listener)
-
-        // Check that no message was not sent
-        Assertions.assertNull(propagatedUserId)
-    }
-
-    @Test
     fun `Create a user can only be done if userName is unique`() {
 
         userRepository.deleteAll()
-        userRepository.save(User(null, "userName", "a", "b", "c", true, Profile.USER, setOf("otherGroupId")))
+        userRepository.save(User(null, "userName", "a", "b", "c", true, Profile.USER))
 
-        val userToCreate = User(null, "userName", "password", "firstName", "lastName", true, Profile.USER, emptySet())
+        val userToCreate = User(null, "userName", "password", "firstName", "lastName", true, Profile.USER)
 
         // Values sent by the message
-        var propagatedUserId: String? = null
+        var propagatedUserId: Long? = null
 
         // Receive the events
         val applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME) as ApplicationEventMulticaster
@@ -159,12 +131,12 @@ class UserServiceTest {
     fun `Update safe user should give only store safe values`() {
 
         userRepository.deleteAll()
-        val user = userRepository.save(User(null, "a", "b", "c", "d", false, Profile.USER, setOf("groupId")))
+        val user = userRepository.save(User(null, "a", "b", "c", "d", false, Profile.USER))
 
-        val userToUpdate = User(user.id, "userName", "password", "firstName", "lastName", true, Profile.ADMIN, setOf("groupId"))
+        val userToUpdate = User(user.id, "userName", "password", "firstName", "lastName", true, Profile.ADMIN)
 
         // Values sent by the message
-        var propagatedUserId: String? = null
+        var propagatedUserId: Long? = null
 
         // Receive the events
         val applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME) as ApplicationEventMulticaster
@@ -182,13 +154,12 @@ class UserServiceTest {
 
         val userSaved = userRepository.findById(updatedUser.id!!).get()
         Assertions.assertNotNull(userSaved)
-        Assertions.assertEquals("userName", userSaved.userName)
+        Assertions.assertEquals("userName", userSaved.name)
         Assertions.assertEquals("firstName", userSaved.firstName)
         Assertions.assertEquals("lastName", userSaved.lastName)
         Assertions.assertNotEquals("password", userSaved.password)
         Assertions.assertFalse(userSaved.enabled)
         Assertions.assertEquals(Profile.USER, userSaved.profile)
-        Assertions.assertEquals(setOf("groupId"), userSaved.participatingGroupIds)
 
         // Check that a message was not sent
         Assertions.assertNotNull(propagatedUserId)
@@ -198,12 +169,12 @@ class UserServiceTest {
     fun `Update unsafe user should give store unsafe values`() {
 
         userRepository.deleteAll()
-        val user = userRepository.save(User(null, "a", "b", "c", "d", false, Profile.USER, setOf("groupId")))
+        val user = userRepository.save(User(null, "a", "b", "c", "d", false, Profile.USER))
 
-        val userToUpdate = User(user.id, "userName", "password", "firstName", "lastName", true, Profile.ADMIN, setOf("groupId"))
+        val userToUpdate = User(user.id, "userName", "password", "firstName", "lastName", true, Profile.ADMIN)
 
         // Values sent by the message
-        var propagatedUserId: String? = null
+        var propagatedUserId: Long? = null
 
         // Receive the events
         val applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME) as ApplicationEventMulticaster
@@ -221,54 +192,26 @@ class UserServiceTest {
 
         val userSaved = userRepository.findById(updatedUser.id!!).get()
         Assertions.assertNotNull(userSaved)
-        Assertions.assertEquals("userName", userSaved.userName)
+        Assertions.assertEquals("userName", userSaved.name)
         Assertions.assertEquals("firstName", userSaved.firstName)
         Assertions.assertEquals("lastName", userSaved.lastName)
         Assertions.assertNotEquals("password", userSaved.password)
         Assertions.assertTrue(userSaved.enabled)
         Assertions.assertEquals(Profile.ADMIN, userSaved.profile)
-        Assertions.assertEquals(setOf("groupId"), userSaved.participatingGroupIds)
 
         // Check that a message was not sent
         Assertions.assertNotNull(propagatedUserId)
     }
 
     @Test
-    fun `Update a user can not change its group`() {
-
-        userRepository.deleteAll()
-        val user = userRepository.save(User(null, "userName", "password", "firstName", "lastName", true, Profile.USER, setOf("groupId")))
-
-        // Values sent by the message
-        var propagatedUserId: String? = null
-
-        // Receive the events
-        val applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME) as ApplicationEventMulticaster
-        val listener = fun(event: ApplicationEvent) {
-            when (event) {
-                is UserUpdatedEvent -> propagatedUserId = event.userId
-            }
-        }
-        applicationEventMulticaster.addApplicationListener(listener)
-
-        // Update user
-        Assertions.assertThrows(BadParameterException::class.java) { userService.updateSafeUser(user.copy(participatingGroupIds = emptySet())) }
-
-        applicationEventMulticaster.removeApplicationListener(listener)
-
-        // Check that no message was not sent
-        Assertions.assertNull(propagatedUserId)
-    }
-
-    @Test
     fun `Create a userName can only be done if userName is unique`() {
         userRepository.deleteAll()
-        userRepository.save(User(null, "existing", "a", "b", "c", true, Profile.USER, setOf("groupId")))
+        userRepository.save(User(null, "existing", "a", "b", "c", true, Profile.USER))
 
-        val user = userRepository.save(User(null, "userName", "password", "firstName", "lastName", true, Profile.USER, setOf("groupId")))
+        val user = userRepository.save(User(null, "userName", "password", "firstName", "lastName", true, Profile.USER))
 
         // Values sent by the message
-        var propagatedUserId: String? = null
+        var propagatedUserId: Long? = null
 
         // Receive the events
         val applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME) as ApplicationEventMulticaster
@@ -280,7 +223,7 @@ class UserServiceTest {
         applicationEventMulticaster.addApplicationListener(listener)
 
         // Update user
-        Assertions.assertThrows(ConstraintException::class.java) { userService.updateSafeUser(user.copy(userName = "existing")) }
+        Assertions.assertThrows(ConstraintException::class.java) { userService.updateSafeUser(user.copy(name = "existing")) }
 
         applicationEventMulticaster.removeApplicationListener(listener)
 
@@ -290,14 +233,20 @@ class UserServiceTest {
 
     @Test
     fun `User can be deleted`() {
+
         userRepository.deleteAll()
-        val user1 = userRepository.save(User("userId1", "userName1", "a", "b", "c", true, Profile.USER, setOf("groupId")))
-        val user2 = userRepository.save(User("userId2", "userName2", "a", "b", "c", true, Profile.USER, setOf("groupId")))
-        groupRepository.save(Group("groupId", "groupName", setOf("userId1", "userId2"), setOf("userId1", "userId2")))
+
+        val user1 = userRepository.save(User(null, "userName1", "a", "b", "c", true, Profile.USER))
+        val user1Id = user1.id!!
+        val user2 = userRepository.save(User(null, "userName2", "a", "b", "c", true, Profile.USER))
+        val user2Id = user2.id!!
+
+        val group = groupRepository.save(Group(null, "groupName", setOf(user1Id, user2Id), setOf(user1Id, user2Id)))
+        val groupId = group.id!!
 
         // Values sent by the message
-        var propagatedUserId: String? = null
-        var propagatedGroupId: String? = null
+        var propagatedUserId: Long? = null
+        var propagatedGroupId: Long? = null
 
         // Receive the events
         val applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME) as ApplicationEventMulticaster
@@ -313,16 +262,16 @@ class UserServiceTest {
         userService.deleteUser(user1)
 
         // Check group was saved
-        val groupUpdated = groupRepository.findById("groupId").get()
+        val groupUpdated = groupRepository.findById(groupId).get()
         Assertions.assertNotNull(groupUpdated)
         Assertions.assertEquals(1, groupUpdated.administratorIds.size)
-        Assertions.assertTrue(groupUpdated.userIds.contains("userId2"))
+        Assertions.assertTrue(groupUpdated.userIds.contains(user2Id))
         Assertions.assertEquals(1, groupUpdated.userIds.size)
-        Assertions.assertTrue(groupUpdated.userIds.contains("userId2"))
+        Assertions.assertTrue(groupUpdated.userIds.contains(user2Id))
 
         // Check that no message was not sent
-        Assertions.assertEquals("userId1", propagatedUserId)
-        Assertions.assertEquals("groupId", propagatedGroupId)
+        Assertions.assertEquals(user1Id, propagatedUserId)
+        Assertions.assertEquals(groupId, propagatedGroupId)
 
         // Delete user should not be possible
         Assertions.assertThrows(ConstraintException::class.java) { userService.deleteUser(user2) }

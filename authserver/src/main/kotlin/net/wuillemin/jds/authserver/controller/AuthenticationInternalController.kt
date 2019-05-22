@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.RestController
 @Api(tags = ["Authentication"], description = "Authenticate the users")
 class AuthenticationInternalController(
     private val authenticationService: AuthenticationService,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Login a user in the system

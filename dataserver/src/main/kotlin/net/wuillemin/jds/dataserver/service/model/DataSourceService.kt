@@ -26,7 +26,8 @@ import org.springframework.stereotype.Service
 class DataSourceService(
     val dataSourceRepository: DataSourceRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Get the list of all dataSources.
@@ -48,7 +49,7 @@ class DataSourceService(
 
         return dataProvider.id
             ?.let { dataProviderId ->
-                dataSourceRepository.findByDataProviderId(dataProviderId)
+                dataSourceRepository.findAllByDataProviderId(dataProviderId)
             }
             ?: throw BadParameterException(E.service.model.dataSource.getForDataProviderNoId)
     }
@@ -71,7 +72,7 @@ class DataSourceService(
 
         }
 
-        return dataSourceRepository.findByDataProviderIdIn(dataProviderIds)
+        return dataSourceRepository.findAllByDataProviderIdIn(dataProviderIds)
     }
 
     /**
@@ -80,8 +81,8 @@ class DataSourceService(
      * @param userId The id of the user that have read access on the data source
      * @return the data sources
      */
-    fun getDataSourcesForReaderId(userId: String): List<DataSource> {
-        return dataSourceRepository.findByUserAllowedToReadIds(userId)
+    fun getDataSourcesForReaderId(userId: Long): List<DataSource> {
+        return dataSourceRepository.findAllByUserAllowedToReadId(userId)
     }
 
     /**
@@ -91,7 +92,7 @@ class DataSourceService(
      * @return the dataSource
      * @throws NotFoundException if the dataSource does not exist
      */
-    fun getDataSourceById(id: String): DataSource {
+    fun getDataSourceById(id: Long): DataSource {
         return dataSourceRepository.findById(id).orElseThrow {
             NotFoundException(C.notFound.idClass, id, DataSource::class)
         }
@@ -103,7 +104,7 @@ class DataSourceService(
      * @param ids The ids of the dataSource
      * @return the dataSources
      */
-    fun getDataSourceByIds(ids: List<String>): List<DataSource> {
+    fun getDataSourceByIds(ids: List<Long>): List<DataSource> {
         return dataSourceRepository.findAllById(ids).toList()
     }
 

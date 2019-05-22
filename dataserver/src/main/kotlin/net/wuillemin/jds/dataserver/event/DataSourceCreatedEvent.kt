@@ -7,4 +7,4 @@ import org.springframework.context.ApplicationEvent
  *
  * @param dataSourceId The object on which the event initially occurred
  */
-class DataSourceCreatedEvent(val dataSourceId: String) : ApplicationEvent(dataSourceId)
+class DataSourceCreatedEvent(val dataSourceId: Long) : ApplicationEvent(dataSourceId)

@@ -29,7 +29,8 @@ class SchemaService(
     private val schemaRepository: SchemaRepository,
     private val dataProviderService: DataProviderService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Get the list of all schemas.
@@ -51,7 +52,7 @@ class SchemaService(
 
         return server.id
             ?.let { serverId ->
-                schemaRepository.findByServerId(serverId).toList()
+                schemaRepository.findAllByServerId(serverId).toList()
             }
             ?: throw BadParameterException(E.service.model.schema.getForServerNoId)
 
@@ -75,7 +76,7 @@ class SchemaService(
 
         }
 
-        return schemaRepository.findByServerIdIn(serverIds)
+        return schemaRepository.findAllByServerIdIn(serverIds)
     }
 
     /**
@@ -85,7 +86,7 @@ class SchemaService(
      * @return the schema
      * @throws NotFoundException if the schema does not exist
      */
-    fun getSchemaById(id: String): Schema {
+    fun getSchemaById(id: Long): Schema {
         return schemaRepository.findById(id).orElseThrow {
             NotFoundException(C.notFound.idClass, id, Schema::class)
         }

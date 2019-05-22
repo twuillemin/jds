@@ -13,7 +13,8 @@ import org.springframework.security.config.http.SessionCreationPolicy
 @Configuration
 @Order(1)
 class WebSecurity01Config(
-    private val logger: Logger) : WebSecurityConfigurerAdapter() {
+    private val logger: Logger
+) : WebSecurityConfigurerAdapter() {
 
     /**
      * Override this method to configure the {@link HttpSecurity}. Typically subclasses

@@ -7,4 +7,4 @@ import org.springframework.context.ApplicationEvent
  *
  * @param schemaId The object on which the event initially occurred
  */
-class SchemaUpdatedEvent(val schemaId: String) : ApplicationEvent(schemaId)
+class SchemaUpdatedEvent(val schemaId: Long) : ApplicationEvent(schemaId)

@@ -28,7 +28,8 @@ class ServerService(
     private val serverRepository: ServerRepository,
     private val schemaService: SchemaService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val logger: Logger) {
+    private val logger: Logger
+) {
 
     /**
      * Get the list of all servers.
@@ -36,7 +37,7 @@ class ServerService(
      * @return the list of all servers
      */
     fun getServers(): List<Server> {
-        return serverRepository.findAll()
+        return serverRepository.findAll().toList()
     }
 
     /**
@@ -45,8 +46,8 @@ class ServerService(
      * @param groupIds The id of the group for which to retrieve the servers
      * @return the servers
      */
-    fun getServersForGroupIds(groupIds: List<String>): List<Server> {
-        return serverRepository.findByGroupIdIn(groupIds)
+    fun getServersForGroupIds(groupIds: List<Long>): List<Server> {
+        return serverRepository.findAllByGroupIdIn(groupIds).toList()
     }
 
     /**
@@ -56,7 +57,7 @@ class ServerService(
      * @return the server
      * @throws NotFoundException if the server does not exist
      */
-    fun getServerById(id: String): Server {
+    fun getServerById(id: Long): Server {
         return serverRepository.findById(id).orElseThrow {
             NotFoundException(C.notFound.idClass, id, Server::class)
         }

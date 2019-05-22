@@ -34,6 +34,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.util.*
 
+// Definition of constants
+private const val GROUP_ID = 1L
+private const val SERVER_ID = 100L
+private const val SCHEMA_ID = 200L
+private const val DATA_PROVIDER_TEST_ID = 300L
+private const val DATA_PROVIDER_LOOKUP_ID = 301L
+private const val DATA_SOURCE_LOOKUP_ID = 400L
+
 @ExtendWith(SpringExtension::class)
 class LookupServiceTest {
 
@@ -66,24 +74,25 @@ class LookupServiceTest {
     // Definition of objects (for mocked services)
     // -------------------------------------------------------------
     private val serverSQL = ServerSQL(
-        "serverId",
+        SERVER_ID,
         "testServer",
-        "groupId",
+        GROUP_ID,
         true,
         "jdbc:h2:mem:",
         "sa",
-        null)
+        null,
+        "org.h2.Driver")
 
     private val schemaSQL = SchemaSQL(
-        "schemaId",
+        SCHEMA_ID,
         "PUBLIC",
-        "groupId",
+        GROUP_ID,
         null)
 
     private val dataProviderLookup = DataProviderSQL(
-        "lookupDPId",
-        "schemaId",
-        "lookupDPId",
+        DATA_PROVIDER_LOOKUP_ID,
+        "DATA_PROVIDER_LOOKUP",
+        SCHEMA_ID,
         listOf(
             ColumnAttribute("ID", DataType.STRING, 200, ReadOnlyStorage("ID", false, false, false)),
             ColumnAttribute("KEY", DataType.STRING, 200, ReadOnlyStorage("KEY", false, false, false)),
@@ -92,9 +101,9 @@ class LookupServiceTest {
         "SELECT * FROM TABLE_LOOKUP")
 
     private val dataProviderTest = DataProviderSQL(
-        "testDPId",
-        "schemaId",
-        "lookupDPId",
+        DATA_PROVIDER_TEST_ID,
+        "dataProviderTest",
+        SCHEMA_ID,
         listOf(
             ColumnAttribute(
                 "ID",
@@ -121,9 +130,9 @@ class LookupServiceTest {
         "SELECT * FROM table_test")
 
     private val dataSourceLookup = DataSource(
-        "lookupDSId",
-        "lookupDPId",
+        DATA_SOURCE_LOOKUP_ID,
         "lookup data source",
+        DATA_PROVIDER_LOOKUP_ID,
         emptySet(),
         emptySet(),
         emptySet())
@@ -143,7 +152,7 @@ class LookupServiceTest {
     }
 
     @Test
-    fun `Can promote a column to lookupnad use it`() {
+    fun `Can promote a column to lookup and use it`() {
 
         sqlConnectionCache.getConnection(schemaSQL).use { connection ->
 
@@ -161,20 +170,20 @@ class LookupServiceTest {
             connection.commit()
         }
 
-        whenever(dataProviderService.getDataProviderById("lookupDPId")).thenReturn(dataProviderLookup)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_LOOKUP_ID)).thenReturn(dataProviderLookup)
 
-        whenever(dataProviderService.getDataProviderById("testDPId")).thenReturn(dataProviderTest)
+        whenever(dataProviderService.getDataProviderById(DATA_PROVIDER_TEST_ID)).thenReturn(dataProviderTest)
 
-        whenever(dataSourceService.getDataSourceById("lookupDSId")).thenReturn(dataSourceLookup)
+        whenever(dataSourceService.getDataSourceById(DATA_SOURCE_LOOKUP_ID)).thenReturn(dataSourceLookup)
 
         whenever(dataProviderService.updateDataProvider(any())).doAnswer { params -> params.getArgument(0) as DataProvider }
 
         val updatedDataProvider = lookupService.promoteColumnToLookup(
-            dataProviderService.getDataProviderById("testDPId"),
+            dataProviderService.getDataProviderById(DATA_PROVIDER_TEST_ID),
             PromoteColumnToLookupQuery(
                 "DATA",
                 5,
-                "lookupDSId",
+                DATA_SOURCE_LOOKUP_ID,
                 "KEY",
                 "VALUE"),
             Locale.getDefault())

@@ -23,7 +23,8 @@ import org.springframework.security.core.SpringSecurityCoreVersion
 open class AuthenticationToken(
     private val principal: String,
     authorities: Collection<GrantedAuthority>,
-    val permission: UserPermission) : AbstractAuthenticationToken(authorities), Loggable {
+    val permission: UserPermission
+) : AbstractAuthenticationToken(authorities), Loggable {
 
     companion object {
         private const val serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID
