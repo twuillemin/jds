@@ -106,7 +106,7 @@ jds:
     # two objects provided by the common library
     # ----------------------------------------------------------------
     database:
-      url: jdbc:postgresql://localhost/jds_common
+      url: jdbc:postgresql://localhost/jds_config
       user: jds
       password: "jds_password"
       driverClassName: "org.postgresql.Driver"
@@ -154,7 +154,7 @@ jds:
     # The database is supposed to be a SQL database
     # ----------------------------------------------------------------
     configurationDatabase:
-      url: jdbc:postgresql://localhost/jds_configuration
+      url: jdbc:postgresql://localhost/jds_config
       user: jds
       password: "jds_password"
       driverClassName: "org.postgresql.Driver"
