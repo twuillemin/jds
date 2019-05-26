@@ -168,11 +168,11 @@ class SQLQueryImporterComplexCasesTest {
         Assertions.assertFalse(col14c.primaryKey)
         Assertions.assertFalse(col14c.autoIncrement)
 
-        val columnNameProductId = columnByName["myid"]!!.name
-        val columnNameProductName = columnByName["name"]!!.name
-        val columnNameCategoryId = columnByName["catid"]!!.name
-        val columnNameCategoryName = columnByName["c.category_name"]!!.name
-        val columnNameDescription = columnByName["upper(p.description)"]!!.name
+        val columnNameProductId = columnByName.getValue("myid").name
+        val columnNameProductName = columnByName.getValue("name").name
+        val columnNameCategoryId = columnByName.getValue("catid").name
+        val columnNameCategoryName = columnByName.getValue("c.category_name").name
+        val columnNameDescription = columnByName.getValue("upper(p.description)").name
 
         // Check the mass insert
         val data: List<Map<String, Any>> = listOf(

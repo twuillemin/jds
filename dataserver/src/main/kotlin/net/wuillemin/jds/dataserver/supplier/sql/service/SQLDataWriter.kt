@@ -238,8 +238,8 @@ class SQLDataWriter(
                             val filteredData = dataForKeys.map { singleObject ->
                                 usableKeysAndContainer.map { (usableKey, _) ->
                                     // The value should never be null as the values given to the function (that can not be null) were used
-                                    // to build the singleObject map
-                                    singleObject[usableKey]!!
+                                    // to build the singleObject map.
+                                    singleObject.getValue(usableKey)
                                 }.toList()
                             }
 

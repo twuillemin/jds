@@ -2,15 +2,18 @@
 
 ## Introduction
 
-This project offers a complete backend allowing for multiple clients to discover and retrieve data stored in a 
-PostgreSQL database at JSON format.
+This project offers a dynamic ORM. ORM because its main function is to allow clients to retrieve data from a SQL 
+database with simple REST+JSON queries. And Dynamic because the mapping between the 'visible' data and the real SQL 
+database can be configured at run time. The projects is a complete backend service allowing for multiple clients 
+to discover and retrieve data. Currently, only PostgreSQL is supported as database.
 
 The software offers the following functions:
 
- * Multi-tenants: Multiple organizations can manage their own private repositories
- * User enrolment and security (JWT tokens)
  * Definition of JSON format by SQL queries for repository administrators
  * CRUD functions for repositories clients
+ * Simple query structure for client side 
+ * Multi-tenants: Multiple organizations can manage their own private repositories shared in the same database
+ * User enrolment and security (JWT tokens)
  * Support of external authentication (google accounts)
  * Localization of error messages
  
@@ -222,7 +225,8 @@ endpoint: `[POST] /api/dataserver/v1/configuration/dataSources`
 ```
 
 Notes:
- * It is not needed to add the administrators of the group as they are... administrators. 
+ * It is not needed to add the administrators of the group as readers of writers as they are... administrators.
+ * Also, writers are automatically added to readers 
 
 ## Client usage
 

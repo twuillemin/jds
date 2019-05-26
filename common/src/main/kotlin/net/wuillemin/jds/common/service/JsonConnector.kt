@@ -2,7 +2,6 @@ package net.wuillemin.jds.common.service
 
 import net.wuillemin.jds.common.exception.ClientException
 import net.wuillemin.jds.common.exception.E
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -11,17 +10,16 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClientException
+import org.springframework.web.client.RestTemplate
 import java.net.URI
 
 /**
  * A service for executing HTTP query sending and receiving JSON data
  *
- * @param restTemplateBuilder The builder for rest template that holds the configuration
+ * @param restTemplate The rest template
  */
 @Service
-class JsonConnector(private val restTemplateBuilder: RestTemplateBuilder) {
-
-    private val restTemplate = restTemplateBuilder.build()
+class JsonConnector(private val restTemplate: RestTemplate) {
 
     /**
      * Simply retrieve an object from a JSON server
